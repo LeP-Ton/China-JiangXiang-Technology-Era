@@ -21,6 +21,7 @@ import {
   validateState,
 } from '../src/game/storage';
 import type { Action, GameState } from '../src/game/types';
+import { operatingCompany } from './fixtures/operating-company';
 
 const company = {
   name: '测试酒业',
@@ -29,7 +30,7 @@ const company = {
   logo: '酱',
   direction: '科技研发' as const,
 };
-const fresh = (seed = 20261111) => createGame(company, seed);
+const fresh = operatingCompany;
 const action = (s: GameState, a: Action) => {
   const result = performAction(s, a);
   assert.ok(result.ok, result.message);
@@ -63,6 +64,11 @@ test('企业创建支持五条路线，状态互不共享', () => {
     validateState(s);
     assert.equal(s.company.name, company.name);
     assert.equal(s.month, 1);
+    assert.equal(s.company.brand, '');
+    assert.equal(s.company.product, '');
+    assert.deepEqual(s.recipes, []);
+    assert.deepEqual(s.products, []);
+    assert.equal(dealerStock(s), 0);
   }
   const a = fresh();
   const b = fresh();
@@ -387,8 +393,13 @@ test('三个月现金不足触发清算，融资可在宽限期救回', () => {
   assert.equal(performAction(s, { type: 'loan', amount: 50 }).ok, false);
 });
 
-test('真实经营闭环可持续 72 个月，历史与存档始终有效', () => {
-  let s = fresh(9876);
+test('从无品牌酒厂起步可持续经营 72 个月，历史与存档始终有效', () => {
+  let s = createGame(company, 9876);
+  s = action(s, {
+    type: 'recipe',
+    recipe: { ...DEFAULT_RECIPE, id: 'new', brand: '测试品牌', name: '测试一号' },
+  });
+  const recipeId = s.recipes[0].id;
   let manufactured = 0;
   let revenue = 0;
   for (let month = 0; month < 72; month++) {
@@ -397,14 +408,14 @@ test('真实经营闭环可持续 72 个月，历史与存档始终有效', () =
     if (s.finance.cash < 50 && s.finance.debt < 250) s = action(s, { type: 'loan', amount: 50 });
     if (s.materials.sorghum < 8 && s.actions > 0) s = action(s, { type: 'procure', tons: 5 });
     if (s.jobs.length === 0 && s.actions > 0 && baseStock(s) < 15) {
-      s = action(s, { type: 'produce', recipeId: 'recipe-1', tons: 3 });
+      s = action(s, { type: 'produce', recipeId, tons: 3 });
       manufactured++;
     }
     const mature = s.batches.filter((b) => b.age >= 3);
     if (finishedStock(s) < 2200 && mature.reduce((v, b) => v + b.tons, 0) > 1.1 && s.actions > 0)
       s = action(s, {
         type: 'blend',
-        recipeId: 'recipe-1',
+        recipeId,
         batchIds: mature.map((b) => b.id),
         bottles: 2000,
       });
@@ -412,14 +423,14 @@ test('真实经营闭环可持续 72 个月，历史与存档始终有效', () =
       if (
         s.actions > 0 &&
         d.lots.reduce((v, l) => v + l.bottles, 0) < 600 &&
-        s.products[0].stock >= 500 &&
+        (s.products[0]?.stock ?? 0) >= 500 &&
         d.health > 40 &&
         d.cash > 6
       )
         s = action(s, {
           type: 'ship',
           dealerId: d.id,
-          productId: 'product-1',
+          productId: s.products[0].id,
           bottles: 500,
           credit: false,
         });
@@ -443,6 +454,64 @@ test('真实经营闭环可持续 72 个月，历史与存档始终有效', () =
   assert.deepEqual(deserializeGame(serializeGame(s)).state, s);
   s = action(s, { type: 'continue' });
   assert.equal(s.milestoneSeen, true);
+});
+
+test('企业注册不创建品牌、产品和销售记录，筹备月份仍可保存和结算', () => {
+  let s = createGame({ name: '新建酒厂', logo: '谷', direction: '稳健经营' }, 99);
+  assert.equal(s.company.brand, '');
+  assert.equal(s.company.product, '');
+  assert.equal(finishedStock(s), 0);
+  assert.equal(dealerStock(s), 0);
+  assert.deepEqual(deserializeGame(serializeGame(s)).state, s);
+  for (let i = 0; i < 8; i++) s = next(s);
+  assert.equal(s.recipes.length, 0);
+  assert.equal(s.products.length, 0);
+  assert.equal(s.reputation, 72);
+  assert.ok(s.history.every((h) => h.revenue === 0 && h.retail === 0));
+  assert.ok(
+    !s.eventHistory.some((e) => ['aging-claim', 'crossover', 'quality-incident'].includes(e.id)),
+  );
+  validateState(s);
+});
+
+test('企业成立后设计品牌与配方，实际勾调才创建首款成品', () => {
+  let s = createGame({ name: '新建酒厂', logo: '谷', direction: '科技研发' }, 99);
+  s = action(s, {
+    type: 'recipe',
+    recipe: { ...DEFAULT_RECIPE, id: 'new', brand: '后创品牌', name: '首款自研酒' },
+  });
+  assert.equal(s.company.brand, '后创品牌');
+  assert.equal(s.company.product, '首款自研酒');
+  assert.equal(s.products.length, 0);
+  assert.equal(s.recipes.length, 1);
+  const r = s.recipes[0];
+  const startingBase = baseStock(s);
+  s = action(s, { type: 'produce', recipeId: r.id, tons: 2 });
+  assert.equal(s.products.length, 0);
+  s = action(s, { type: 'blend', recipeId: r.id, batchIds: ['batch-2'], bottles: 2000 });
+  assert.equal(s.products[0].recipe.brand, '后创品牌');
+  assert.equal(s.products[0].recipe.name, '首款自研酒');
+  assert.equal(finishedStock(s), 2000);
+  assert.ok(baseStock(s) < startingBase);
+  s = action(s, {
+    type: 'ship',
+    dealerId: 'dealer-1',
+    productId: s.products[0].id,
+    bottles: 500,
+    credit: false,
+  });
+  assert.equal(dealerStock(s), 500);
+  assert.ok(next(s).history[0].revenue > 0);
+});
+
+test('已有品牌的旧档继续保留品牌、配方、成品和渠道库存', () => {
+  const legacy = fresh();
+  const restored = deserializeGame(serializeGame(legacy)).state;
+  assert.equal(restored.company.brand, '测试品牌');
+  assert.equal(restored.company.product, '测试一号');
+  assert.equal(restored.products[0].stock, 3200);
+  assert.equal(dealerStock(restored), 1600);
+  assert.deepEqual(restored, legacy);
 });
 
 test('所有十项技术部署分别产生实际规则收益', () => {

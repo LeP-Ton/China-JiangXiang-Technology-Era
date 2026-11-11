@@ -37,6 +37,13 @@ export default function Dashboard({ s, navigate }: PanelProps) {
   const quality = averageQuality(s);
   const tasks = [
     {
+      icon: <Beaker size={17} />,
+      title: '创立品牌与首款配方',
+      detail: '先决定卖什么酒，再安排生产',
+      done: s.recipes.length > 0,
+      to: 'lab',
+    },
+    {
       icon: <FlaskConical size={17} />,
       title: '研发第一项酿造技术',
       detail: '让技术真正走出实验室',
@@ -82,6 +89,23 @@ export default function Dashboard({ s, navigate }: PanelProps) {
           <small>标准经营周期 / 60 个月</small>
         </div>
       </div>
+      {!s.recipes.length && (
+        <div className="insight-banner">
+          <div className="insight-icon">
+            <Beaker size={22} />
+          </div>
+          <div>
+            <strong>先有酒厂，再有属于你的品牌。</strong>
+            <p>
+              企业与基酒已接收。现在去确定品牌名、首款产品及风味定位，保存配方后再组织生产和销售。
+            </p>
+          </div>
+          <button onClick={() => navigate('lab')}>
+            设计首款产品
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      )}
       <div className="metrics-grid">
         <Metric
           label="企业可用现金"
@@ -210,7 +234,7 @@ export default function Dashboard({ s, navigate }: PanelProps) {
           </div>
           <div className="health-bars">
             {[
-              { label: '品牌信誉', value: s.reputation },
+              { label: s.company.brand ? '品牌信誉' : '企业信誉', value: s.reputation },
               { label: '产品品质', value: quality },
               { label: '技术积累', value: technologyLevel(s) },
             ].map((x) => (
@@ -218,8 +242,14 @@ export default function Dashboard({ s, navigate }: PanelProps) {
                 <span>
                   {x.label}
                   <b>
-                    {num(x.value)}
-                    <small>/ 100</small>
+                    {x.label === '产品品质' && !s.products.length ? (
+                      '待上市'
+                    ) : (
+                      <>
+                        {num(x.value)}
+                        <small>/ 100</small>
+                      </>
+                    )}
                   </b>
                 </span>
                 <Progress value={x.value} />

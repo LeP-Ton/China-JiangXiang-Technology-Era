@@ -3,11 +3,23 @@ import { ArrowRight, Factory, PackagePlus, Settings2, Warehouse } from 'lucide-r
 import { FACILITIES, SEGMENTS } from '../game/data';
 import { matureBatch, qualityScore } from '../game/flavor';
 import { baseStock, bottlingCapacity, productionCapacity } from '../game/selectors';
-import { Badge, Empty, Field, Metric, money, num, PageTitle, Panel, Progress, Tip } from './shared';
+import {
+  Badge,
+  Empty,
+  Field,
+  Metric,
+  money,
+  num,
+  PageTitle,
+  Panel,
+  ProductSetupPrompt,
+  Progress,
+  Tip,
+} from './shared';
 import type { PanelProps } from './shared';
 
-export function Production({ s, act }: PanelProps) {
-  const [recipe, setRecipe] = useState(s.recipes[0].id);
+export function Production({ s, act, navigate }: PanelProps) {
+  const [recipe, setRecipe] = useState(s.recipes[0]?.id ?? '');
   const [tons, setTons] = useState(3);
   const [procurement, setProcurement] = useState(5);
   const occupied = s.jobs.reduce((v, j) => v + j.tons, 0);
@@ -42,39 +54,48 @@ export function Production({ s, act }: PanelProps) {
       </div>
       <div className="two-columns">
         <Panel title="下达生产计划" extra={<Badge>消耗 1 次行动</Badge>}>
-          <Field label="工艺配方">
-            <select value={recipe} onChange={(e) => setRecipe(e.target.value)}>
-              {s.recipes.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name} · {r.fermentation} 个月发酵
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="计划基酒产量（吨）" hint="实际出酒量受工艺与已部署技术影响。">
-            <input
-              type="number"
-              min={0.5}
-              max={100}
-              step={0.5}
-              value={tons}
-              onChange={(e) => setTons(Number(e.target.value))}
+          {s.recipes.length ? (
+            <>
+              <Field label="工艺配方">
+                <select value={recipe} onChange={(e) => setRecipe(e.target.value)}>
+                  {s.recipes.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name} · {r.fermentation} 个月发酵
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="计划基酒产量（吨）" hint="实际出酒量受工艺与已部署技术影响。">
+                <input
+                  type="number"
+                  min={0.5}
+                  max={100}
+                  step={0.5}
+                  value={tons}
+                  onChange={(e) => setTons(Number(e.target.value))}
+                />
+              </Field>
+              <div className="fact-row">
+                <span>在制空间利用率</span>
+                <strong>{num((occupied / capacity) * 100)}%</strong>
+              </div>
+              <Progress value={(occupied / capacity) * 100} />
+              <Tip>生产消耗原料和加工费；配方的精细摘酒程度越高，单位产出的原料投入越高。</Tip>
+              <button
+                className="primary full"
+                disabled={s.actions < 1}
+                onClick={() => act({ type: 'produce', recipeId: recipe, tons })}
+              >
+                <Factory size={15} />
+                启动生产批次
+              </button>
+            </>
+          ) : (
+            <ProductSetupPrompt
+              onStart={() => navigate('lab')}
+              description="车间已就绪，但还没有产品工艺。先在配方实验室确定品牌、首款产品和酿造参数，再下达生产计划。"
             />
-          </Field>
-          <div className="fact-row">
-            <span>在制空间利用率</span>
-            <strong>{num((occupied / capacity) * 100)}%</strong>
-          </div>
-          <Progress value={(occupied / capacity) * 100} />
-          <Tip>生产消耗原料和加工费；配方的精细摘酒程度越高，单位产出的原料投入越高。</Tip>
-          <button
-            className="primary full"
-            disabled={s.actions < 1}
-            onClick={() => act({ type: 'produce', recipeId: recipe, tons })}
-          >
-            <Factory size={15} />
-            启动生产批次
-          </button>
+          )}
         </Panel>
         <Panel title="原料采购" extra={<PackagePlus size={18} />}>
           <div className="material-illustration">
@@ -196,15 +217,15 @@ export function Production({ s, act }: PanelProps) {
   );
 }
 
-export function StorageCenter({ s, act }: PanelProps) {
+export function StorageCenter({ s, act, navigate }: PanelProps) {
   const [selected, setSelected] = useState<string[]>([]);
-  const [recipe, setRecipe] = useState(s.recipes[0].id);
+  const [recipe, setRecipe] = useState(s.recipes[0]?.id ?? '');
   const [bottles, setBottles] = useState(2000);
   const total = baseStock(s);
   const aged = s.batches.filter((b) => b.age >= 12).reduce((v, b) => v + b.tons, 0);
   const picked = s.batches.filter((b) => selected.includes(b.id));
   const pickedTons = picked.reduce((v, b) => v + b.tons, 0);
-  const r = s.recipes.find((r) => r.id === recipe)!;
+  const r = s.recipes.find((r) => r.id === recipe);
   return (
     <>
       <PageTitle
@@ -301,53 +322,67 @@ export function StorageCenter({ s, act }: PanelProps) {
       </Panel>
       <div className="two-columns">
         <Panel title="基酒勾调与灌装" extra={<Badge>1 吨 ≈ 2,000 瓶</Badge>}>
-          <div className="form-grid">
-            <Field label="产品配方">
-              <select value={recipe} onChange={(e) => setRecipe(e.target.value)}>
-                {s.recipes.map((x) => (
-                  <option key={x.id} value={x.id}>
-                    {x.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="灌装数量（瓶）">
-              <input
-                type="number"
-                min={200}
-                step={200}
-                value={bottles}
-                onChange={(e) => setBottles(Number(e.target.value))}
-              />
-            </Field>
-          </div>
-          <div className="fact-row">
-            <span>已选 {picked.length} 批基酒</span>
-            <strong>{num(pickedTons, 3)} 吨</strong>
-          </div>
-          <div className="fact-row">
-            <span>预计耗酒（含基础损耗）</span>
-            <strong>{num((bottles / 2000) * 1.025, 3)} 吨</strong>
-          </div>
-          <div className="fact-row">
-            <span>本月剩余灌装能力</span>
-            <strong>{num(bottlingCapacity(s) - s.bottledThisMonth)} 瓶</strong>
-          </div>
-          <Tip>
-            {r.segment}最低酒龄 {SEGMENTS[r.segment].minAge}{' '}
-            月。按选中批次的库存比例勾调，实际酒龄低于目标 {r.aging} 月会降低协调性。
-          </Tip>
-          <button
-            className="primary full"
-            disabled={!picked.length || s.actions < 1}
-            onClick={() => {
-              const result = act({ type: 'blend', recipeId: recipe, batchIds: selected, bottles });
-              if (result.ok) setSelected([]);
-            }}
-          >
-            确认勾调并灌装
-            <ArrowRight size={15} />
-          </button>
+          {r ? (
+            <>
+              <div className="form-grid">
+                <Field label="产品配方">
+                  <select value={recipe} onChange={(e) => setRecipe(e.target.value)}>
+                    {s.recipes.map((x) => (
+                      <option key={x.id} value={x.id}>
+                        {x.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="灌装数量（瓶）">
+                  <input
+                    type="number"
+                    min={200}
+                    step={200}
+                    value={bottles}
+                    onChange={(e) => setBottles(Number(e.target.value))}
+                  />
+                </Field>
+              </div>
+              <div className="fact-row">
+                <span>已选 {picked.length} 批基酒</span>
+                <strong>{num(pickedTons, 3)} 吨</strong>
+              </div>
+              <div className="fact-row">
+                <span>预计耗酒（含基础损耗）</span>
+                <strong>{num((bottles / 2000) * 1.025, 3)} 吨</strong>
+              </div>
+              <div className="fact-row">
+                <span>本月剩余灌装能力</span>
+                <strong>{num(bottlingCapacity(s) - s.bottledThisMonth)} 瓶</strong>
+              </div>
+              <Tip>
+                {r.segment}最低酒龄 {SEGMENTS[r.segment].minAge}{' '}
+                月。按选中批次的库存比例勾调，实际酒龄低于目标 {r.aging} 月会降低协调性。
+              </Tip>
+              <button
+                className="primary full"
+                disabled={!picked.length || s.actions < 1}
+                onClick={() => {
+                  const result = act({
+                    type: 'blend',
+                    recipeId: recipe,
+                    batchIds: selected,
+                    bottles,
+                  });
+                  if (result.ok) setSelected([]);
+                }}
+              >
+                确认勾调并灌装
+                <ArrowRight size={15} />
+              </button>
+            </>
+          ) : (
+            <ProductSetupPrompt
+              onStart={() => navigate('lab')}
+              description="开局基酒已接收入库，但还没有你的产品配方。先确定品牌、风味与消费定位，再选择批次勾调灌装。"
+            />
+          )}
         </Panel>
         <Panel className="cellar-note">
           <span className="cellar-glyph">藏</span>

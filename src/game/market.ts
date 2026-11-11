@@ -147,5 +147,7 @@ export function settleMarket(s: GameState) {
   if (meanPrice < 0.72) s.reputation = clamp(s.reputation - (0.72 - meanPrice) * 10);
   s.awareness = clamp(s.awareness * 0.992 + Math.min(0.8, totalRetail / 6000));
   const quality = s.products.reduce((v, p) => v + p.quality, 0) / Math.max(1, s.products.length);
-  s.reputation = clamp(s.reputation + (quality - 70) * 0.025 - s.complianceRisk * 0.003);
+  s.reputation = clamp(
+    s.reputation + (s.products.length ? (quality - 70) * 0.025 : 0) - s.complianceRisk * 0.003,
+  );
 }

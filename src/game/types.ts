@@ -18,6 +18,7 @@ export interface Company {
   logo: string;
   direction: Direction;
 }
+export type CompanySetup = Pick<Company, 'name' | 'logo' | 'direction'>;
 export interface Recipe {
   id: string;
   name: string;

@@ -1,6 +1,6 @@
 import { DEFAULT_RECIPE, ROLES, TECHS } from './data';
-import { agedFlavor, predictFlavor, qualityScore } from './flavor';
-import type { Company, Finance, GameState, Role } from './types';
+import { predictFlavor, qualityScore } from './flavor';
+import type { CompanySetup, Finance, GameState, Role } from './types';
 
 export function emptyFinance(
   cash: number,
@@ -32,13 +32,9 @@ export function emptyFinance(
     cashStart: cash,
   };
 }
-export function createGame(company: Company, seed = 20261111): GameState {
-  const recipe = {
-    ...DEFAULT_RECIPE,
-    name: company.product.trim() || '初酿·经典',
-    brand: company.brand.trim() || '观山',
-  };
-  const f = predictFlavor(recipe);
+export function createGame(company: CompanySetup, seed = 20261111): GameState {
+  // 交接的是酒厂及原酒，品牌、配方和可售产品由玩家在经营阶段建立。
+  const f = predictFlavor(DEFAULT_RECIPE);
   const staff = Object.fromEntries(
     ROLES.map((r) => [
       r.name,
@@ -50,8 +46,8 @@ export function createGame(company: Company, seed = 20261111): GameState {
     company: {
       ...company,
       name: company.name.trim() || '观山酒业',
-      brand: recipe.brand,
-      product: recipe.name,
+      brand: '',
+      product: '',
     },
     month: 1,
     seed: seed >>> 0,
@@ -69,23 +65,8 @@ export function createGame(company: Company, seed = 20261111): GameState {
     materials: { sorghum: 18, wheat: 8 },
     staff,
     capacity: { production: 8, storage: 50, bottling: 6000, automation: 0 },
-    recipes: [recipe],
-    products: [
-      {
-        id: 'product-1',
-        recipe: { ...recipe },
-        flavor: agedFlavor(f, 12),
-        quality: qualityScore(agedFlavor(f, 12)),
-        stock: 3200,
-        unitCost: 58,
-        sold: 0,
-        feedback: 72,
-        lastAge: 12,
-        lastSold: 0,
-        lastRepeat: 0,
-        repeatRate: 0,
-      },
-    ],
+    recipes: [],
+    products: [],
     batches: [
       {
         id: 'batch-1',
@@ -97,7 +78,7 @@ export function createGame(company: Company, seed = 20261111): GameState {
         flavor: f,
         quality: qualityScore(f),
         process: '传统固态发酵',
-        recipeId: recipe.id,
+        recipeId: 'initial-process',
         traceable: true,
         inspected: true,
       },
@@ -111,7 +92,7 @@ export function createGame(company: Company, seed = 20261111): GameState {
         flavor: f,
         quality: qualityScore(f),
         process: '传统固态发酵',
-        recipeId: recipe.id,
+        recipeId: 'initial-process',
         traceable: true,
         inspected: true,
       },
@@ -125,7 +106,7 @@ export function createGame(company: Company, seed = 20261111): GameState {
         flavor: f,
         quality: qualityScore(f),
         process: '传统固态发酵',
-        recipeId: recipe.id,
+        recipeId: 'initial-process',
         traceable: true,
         inspected: false,
       },
@@ -148,14 +129,12 @@ export function createGame(company: Company, seed = 20261111): GameState {
         reach: 1400,
         health: 86,
         cash: 45,
-        lots: [
-          { productId: 'product-1', bottles: 1000, unitCost: 110.88, price: 168, quality: 72 },
-        ],
+        lots: [],
         receivables: [],
-        soldLast: 620,
+        soldLast: 0,
         shippedLast: 0,
         paidLast: 0,
-        priceFactor: 0.98,
+        priceFactor: 1,
       },
       {
         id: 'dealer-2',
@@ -164,12 +143,12 @@ export function createGame(company: Company, seed = 20261111): GameState {
         reach: 900,
         health: 78,
         cash: 30,
-        lots: [{ productId: 'product-1', bottles: 600, unitCost: 110.88, price: 168, quality: 72 }],
+        lots: [],
         receivables: [],
-        soldLast: 380,
+        soldLast: 0,
         shippedLast: 0,
         paidLast: 0,
-        priceFactor: 0.98,
+        priceFactor: 1,
       },
     ],
     history: [],
@@ -179,8 +158,7 @@ export function createGame(company: Company, seed = 20261111): GameState {
         month: 1,
         type: '经营',
         title: '第一坛酒，第一张报表',
-        detail:
-          '地方酒厂已交接。320 万启动资金、14 吨基酒和两个经销商。先试着勾调一批，再关注终端是否真的卖得动。',
+        detail: '地方酒厂已交接。先创立品牌、设计首款配方，再组织生产、勾调和销售。',
       },
     ],
     events: [],
@@ -221,7 +199,7 @@ export function createGame(company: Company, seed = 20261111): GameState {
       break;
   }
   s.finance.cashStart = s.finance.cash;
-  s.news[0].detail = `地方酒厂已交接。${s.finance.cash} 万启动资金、${s.batches.reduce((v, b) => v + b.tons, 0)} 吨基酒和两个经销商。先试着勾调一批，再关注终端是否真的卖得动。`;
+  s.news[0].detail = `地方酒厂已交接：${s.finance.cash} 万启动资金、${s.batches.reduce((v, b) => v + b.tons, 0)} 吨基酒和两个待供货渠道。品牌、配方和成品尚未建立，请先设计首款产品。`;
   return s;
 }
 export const cloneGame = (s: GameState): GameState => structuredClone(s);

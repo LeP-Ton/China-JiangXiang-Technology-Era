@@ -1,14 +1,20 @@
 import { useState } from 'react';
-import { Beaker, FlaskConical, Plus, Save, Sparkles } from 'lucide-react';
+import { Beaker, FlaskConical, Plus, Save } from 'lucide-react';
 import { DEFAULT_RECIPE, FLAVORS, SEGMENTS } from '../game/data';
 import { forecast } from '../game/flavor';
 import type { Recipe, Segment } from '../game/types';
 import { FlavorChart } from './Charts';
 import { Badge, Field, money, PageTitle, Panel, Progress, Tip } from './shared';
 import type { PanelProps } from './shared';
+import WineBottle from './WineBottle';
 
 export default function Laboratory({ s, act }: PanelProps) {
-  const [r, setR] = useState<Recipe>({ ...s.recipes[0] });
+  const [r, setR] = useState<Recipe>(
+    s.recipes[0] ? { ...s.recipes[0] } : { ...DEFAULT_RECIPE, id: 'new', name: '', brand: '' },
+  );
+  const [preview, setPreview] = useState<'flavor' | 'bottle'>(
+    s.recipes.length ? 'flavor' : 'bottle',
+  );
   const prediction = forecast(r, s);
   const update = (key: keyof Recipe, value: string | number) =>
     setR((old) => ({ ...old, [key]: value }));
@@ -75,7 +81,7 @@ export default function Laboratory({ s, act }: PanelProps) {
                 ...DEFAULT_RECIPE,
                 id: 'new',
                 brand: s.company.brand,
-                name: `新配方 ${s.recipes.length + 1}`,
+                name: '',
               })
             }
           >
@@ -84,6 +90,11 @@ export default function Laboratory({ s, act }: PanelProps) {
           </button>
         }
       />
+      {!s.recipes.length && (
+        <Tip>
+          酒厂已经成立，现在决定首款产品叫什么、服务哪类消费者，再用工艺与风味支撑定位。保存配方后，还需实际生产或使用开局基酒勾调，才会形成成品。
+        </Tip>
+      )}
       <div className="lab-grid">
         <Panel
           title="工艺设计"
@@ -111,6 +122,7 @@ export default function Laboratory({ s, act }: PanelProps) {
             <Field label="产品名称">
               <input
                 value={r.name}
+                placeholder="为首款产品命名"
                 maxLength={30}
                 onChange={(e) => update('name', e.target.value)}
               />
@@ -118,6 +130,7 @@ export default function Laboratory({ s, act }: PanelProps) {
             <Field label="所属品牌">
               <input
                 value={r.brand}
+                placeholder="创立你的白酒品牌"
                 maxLength={30}
                 onChange={(e) => update('brand', e.target.value)}
               />
@@ -197,19 +210,43 @@ export default function Laboratory({ s, act }: PanelProps) {
         </Panel>
         <div className="stack">
           <Panel
-            title="AI 风味预测"
+            title="风味与产品预览"
             eyebrow="不靠概念，靠参数"
             extra={
-              <Badge>
-                <Sparkles size={11} />
-                内部模拟
-              </Badge>
+              <div className="filter-tabs" aria-label="产品预览方式">
+                <button
+                  className={preview === 'flavor' ? 'active' : ''}
+                  onClick={() => setPreview('flavor')}
+                >
+                  风味雷达
+                </button>
+                <button
+                  className={preview === 'bottle' ? 'active' : ''}
+                  onClick={() => setPreview('bottle')}
+                >
+                  包装预览
+                </button>
+              </div>
             }
           >
-            <FlavorChart
-              flavor={prediction.flavor}
-              comparison={s.experiments[0]?.name === r.name ? s.experiments[0].flavor : undefined}
-            />
+            {preview === 'flavor' ? (
+              <FlavorChart
+                flavor={prediction.flavor}
+                comparison={s.experiments[0]?.name === r.name ? s.experiments[0].flavor : undefined}
+              />
+            ) : (
+              <div className={`lab-packaging-preview packaging-${r.packaging}`}>
+                <WineBottle
+                  className="lab-bottle"
+                  brand={r.brand}
+                  product={r.name}
+                  company={s.company.name}
+                  logo={s.company.logo}
+                  packaging={r.packaging}
+                />
+                <small>设计效果预览 · 尚未生产</small>
+              </div>
+            )}
             <div className="lab-scores">
               <div>
                 <small>预测品质</small>

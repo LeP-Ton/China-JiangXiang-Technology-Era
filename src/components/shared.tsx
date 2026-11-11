@@ -1,8 +1,31 @@
 import type { ReactNode } from 'react';
-import { ArrowUpRight, ChevronRight, Info, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronRight, Info, Sparkles } from 'lucide-react';
 import type { Action, ActionResult, GameState } from '../game/types';
 
 export type Navigate = (page: string) => void;
+export function ProductSetupPrompt({
+  onStart,
+  title = '先决定，你要酿一款什么酒',
+  description = '企业已经成立。下一步创立品牌、命名产品并设计首款配方，成品将由后续生产和勾调形成。',
+  label = '创立品牌与首款配方',
+}: {
+  onStart: () => void;
+  title?: string;
+  description?: string;
+  label?: string;
+}) {
+  return (
+    <div className="product-setup-prompt">
+      <Sparkles size={26} />
+      <h3>{title}</h3>
+      <p>{description}</p>
+      <button className="primary" onClick={onStart}>
+        {label}
+        <ArrowRight size={15} />
+      </button>
+    </div>
+  );
+}
 export interface PanelProps {
   s: GameState;
   act: (action: Action) => ActionResult;

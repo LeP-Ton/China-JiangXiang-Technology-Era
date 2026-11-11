@@ -10,7 +10,18 @@ import {
 } from '../game/selectors';
 import type { Product } from '../game/types';
 import { OperatingChart } from './Charts';
-import { Badge, Field, Metric, money, num, PageTitle, Panel, Progress, Tip } from './shared';
+import {
+  Badge,
+  Field,
+  Metric,
+  money,
+  num,
+  PageTitle,
+  Panel,
+  ProductSetupPrompt,
+  Progress,
+  Tip,
+} from './shared';
 import type { PanelProps } from './shared';
 import WineBottle from './WineBottle';
 
@@ -111,7 +122,7 @@ export function Products(props: PanelProps) {
         extra={
           <button className="primary" onClick={() => props.navigate('lab')}>
             <Plus size={15} />
-            设计新产品
+            {props.s.recipes.length ? '设计新产品' : '创立品牌与首款配方'}
           </button>
         }
       />
@@ -119,6 +130,40 @@ export function Products(props: PanelProps) {
         企业成品库存会在月末自动参与电商直销，平台费用为直销收入的
         8%。向经销商发货需主动安排，进货价为建议零售价的 66%。
       </Tip>
+      {!props.s.recipes.length && (
+        <Panel>
+          <ProductSetupPrompt onStart={() => props.navigate('lab')} />
+        </Panel>
+      )}
+      {props.s.recipes.some((r) => !props.s.products.some((p) => p.recipe.id === r.id)) && (
+        <Panel
+          title="已归档的产品方案"
+          extra={<Badge tone="amber">配方已建立 · 尚未形成成品</Badge>}
+        >
+          {props.s.recipes
+            .filter((r) => !props.s.products.some((p) => p.recipe.id === r.id))
+            .map((r) => (
+              <div className="unbottled-recipe" key={r.id}>
+                <div>
+                  <small>
+                    {r.brand} / {r.segment}
+                  </small>
+                  <h3>{r.name}</h3>
+                  <p>确定工艺只是开始，实际勾调灌装后才会进入成品库。</p>
+                </div>
+                <div className="button-row">
+                  <button className="secondary" onClick={() => props.navigate('production')}>
+                    组织生产
+                  </button>
+                  <button className="primary" onClick={() => props.navigate('storage')}>
+                    勾调灌装
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </Panel>
+      )}
       <div className="products-grid">
         {props.s.products.map((p) => (
           <ProductCard key={p.id} p={p} {...props} />
@@ -128,9 +173,9 @@ export function Products(props: PanelProps) {
   );
 }
 
-export function Dealers({ s, act }: PanelProps) {
+export function Dealers({ s, act, navigate }: PanelProps) {
   const [dealer, setDealer] = useState(s.dealers[0].id);
-  const [product, setProduct] = useState(s.products[0].id);
+  const [product, setProduct] = useState(s.products[0]?.id ?? '');
   const [bottles, setBottles] = useState(1000);
   const [credit, setCredit] = useState(false);
   const [region, setRegion] = useState('华东');
@@ -228,52 +273,67 @@ export function Dealers({ s, act }: PanelProps) {
       </Panel>
       <div className="two-columns">
         <Panel title="向经销商发货" extra={<Package size={18} />}>
-          <div className="form-grid">
-            <Field label="合作经销商">
-              <select value={dealer} onChange={(e) => setDealer(e.target.value)}>
-                {s.dealers.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="出货产品">
-              <select value={product} onChange={(e) => setProduct(e.target.value)}>
-                {s.products.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.recipe.name} · 余 {p.stock} 瓶
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-          <Field label="出货数量 / 瓶">
-            <input
-              type="number"
-              min={100}
-              step={100}
-              value={bottles}
-              onChange={(e) => setBottles(Number(e.target.value))}
+          {s.products.length ? (
+            <>
+              <div className="form-grid">
+                <Field label="合作经销商">
+                  <select value={dealer} onChange={(e) => setDealer(e.target.value)}>
+                    {s.dealers.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="出货产品">
+                  <select value={product} onChange={(e) => setProduct(e.target.value)}>
+                    {s.products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.recipe.name} · 余 {p.stock} 瓶
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              <Field label="出货数量 / 瓶">
+                <input
+                  type="number"
+                  min={100}
+                  step={100}
+                  value={bottles}
+                  onChange={(e) => setBottles(Number(e.target.value))}
+                />
+              </Field>
+              <label className="checkbox-line">
+                <input
+                  type="checkbox"
+                  checked={credit}
+                  onChange={(e) => setCredit(e.target.checked)}
+                />
+                <span>允许赊销：首付 40%，余款两月后到期</span>
+              </label>
+              <Tip>
+                现款交易消耗经销商流动资金；赊销能够提前确认收入，但不保证按期收回现金。经销商库存过高会拒收新货。
+              </Tip>
+              <button
+                className="primary full"
+                disabled={s.actions < 1 || finishedStock(s) === 0}
+                onClick={() =>
+                  act({ type: 'ship', dealerId: dealer, productId: product, bottles, credit })
+                }
+              >
+                确认发货
+                <ArrowRight size={15} />
+              </button>
+            </>
+          ) : (
+            <ProductSetupPrompt
+              onStart={() => navigate(s.recipes.length ? 'storage' : 'lab')}
+              title="渠道已就绪，等待首款成品"
+              description="目前没有可售产品。先完成品牌和配方设计，再用实际基酒勾调灌装；发货之后才会产生渠道库存与回款。"
+              label={s.recipes.length ? '安排首批勾调' : '设计首款产品'}
             />
-          </Field>
-          <label className="checkbox-line">
-            <input type="checkbox" checked={credit} onChange={(e) => setCredit(e.target.checked)} />
-            <span>允许赊销：首付 40%，余款两月后到期</span>
-          </label>
-          <Tip>
-            现款交易消耗经销商流动资金；赊销能够提前确认收入，但不保证按期收回现金。经销商库存过高会拒收新货。
-          </Tip>
-          <button
-            className="primary full"
-            disabled={s.actions < 1 || finishedStock(s) === 0}
-            onClick={() =>
-              act({ type: 'ship', dealerId: dealer, productId: product, bottles, credit })
-            }
-          >
-            确认发货
-            <ArrowRight size={15} />
-          </button>
+          )}
         </Panel>
         <Panel title="拓展区域渠道" extra={<Plus size={18} />}>
           <div className="region-grid">
@@ -320,13 +380,13 @@ export function Marketing({ s, act }: PanelProps) {
       />
       <div className="metrics-grid three">
         <Metric
-          label="品牌知名度"
+          label={s.company.brand ? '品牌知名度' : '企业知名度'}
           value={num(s.awareness)}
           unit="/ 100"
           detail="影响触达与高端定位的品牌支撑"
         />
         <Metric
-          label="品牌信誉"
+          label={s.company.brand ? '品牌信誉' : '企业信誉'}
           value={num(s.reputation)}
           unit="/ 100"
           detail="产品体验与真实宣传积累的信任"

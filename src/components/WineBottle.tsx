@@ -9,6 +9,7 @@ interface WineBottleProps {
   logo: string;
   packaging?: Recipe['packaging'];
   className?: string;
+  unbranded?: boolean;
 }
 
 function BrandInscription({ brand }: { brand: string }) {
@@ -46,6 +47,7 @@ export default function WineBottle({
   logo,
   packaging = '雅致',
   className = '',
+  unbranded = false,
 }: WineBottleProps) {
   const id = `wine-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const fill = (name: string) => `url(#${id}-${name})`;
@@ -55,23 +57,27 @@ export default function WineBottle({
   const simple = packaging === '简装';
   const outline =
     'M112 121H188V162C188 180 210 180 220 207C227 228 226 263 226 290L224 481C224 510 202 528 150 529C98 528 76 510 76 481L74 290C74 263 73 228 80 207C90 180 112 180 112 162Z';
-  const productLines = Array.from(displayProduct).reduce<string[]>((lines, character, i) => {
-    const row = Math.floor(i / 14);
-    lines[row] = (lines[row] || '') + character;
-    return lines;
-  }, []);
+  const productLines = unbranded
+    ? ['品牌待创立', '产品待研发']
+    : Array.from(displayProduct).reduce<string[]>((lines, character, i) => {
+        const row = Math.floor(i / 14);
+        lines[row] = (lines[row] || '') + character;
+        return lines;
+      }, []);
   return (
     <svg
       className={`crafted-bottle ${collectible ? 'bottle-collectible' : simple ? 'bottle-simple' : 'bottle-elegant'} ${className}`}
       viewBox="0 0 300 560"
       role="img"
-      aria-label={`${displayBrand} · ${displayProduct} · ${packaging}包装酒瓶`}
-      data-brand={displayBrand}
+      aria-label={
+        unbranded
+          ? `${company}企业形象示意酒瓶，品牌与产品尚未创建`
+          : `${displayBrand} · ${displayProduct} · ${packaging}包装酒瓶`
+      }
+      data-brand={unbranded ? '' : displayBrand}
       data-packaging={packaging}
     >
-      <title>
-        {displayBrand} · {displayProduct}
-      </title>
+      <title>{unbranded ? `${company}企业形象示意` : `${displayBrand} · ${displayProduct}`}</title>
       <defs>
         <linearGradient id={`${id}-ceramic`} x1="0" x2="1">
           {collectible ? (
@@ -210,14 +216,17 @@ export default function WineBottle({
           stroke={collectible ? '#b5a276' : '#d5c89f'}
           strokeWidth=".45"
         />
-        <g className="bottle-emblem" transform="translate(138 226) scale(.375)">
+        <g
+          className="bottle-emblem"
+          transform={unbranded ? 'translate(125 284) scale(.78)' : 'translate(138 226) scale(.375)'}
+        >
           {isUploadedLogo(logo) ? (
             <image href={logo} width="64" height="64" preserveAspectRatio="xMidYMid meet" />
           ) : (
             <EmblemArtwork logo={logo} />
           )}
         </g>
-        <BrandInscription brand={displayBrand} />
+        {!unbranded && <BrandInscription brand={displayBrand} />}
         <path d="M126 402h48" stroke="currentColor" className="bottle-foil" strokeWidth=".55" />
         {productLines.map((line, index) => (
           <text

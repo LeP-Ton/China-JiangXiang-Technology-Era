@@ -150,8 +150,7 @@ export function validateState(value: unknown): asserts value is GameState {
     !array(s.eventHistory, 10)
   )
     throw new Error('存档记录集合无效');
-  if (!s.recipes.length || !s.products.length || !s.dealers.length)
-    throw new Error('核心经营档案为空');
+  if (!s.dealers.length) throw new Error('渠道经营档案为空');
   s.recipes.forEach((r) => {
     if (!strs(r, ['id'])) throw new Error('配方标识缺失');
     validRecipe(r);

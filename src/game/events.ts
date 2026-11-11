@@ -311,17 +311,25 @@ export function eligibleEvents(s: GameState): string[] {
       'quantum',
       s.month >= 2 && (s.experimentCount > 0 || s.research.some((r) => r.active || r.stage > 0)),
     ],
-    ['aging-claim', s.month >= 3 && s.batches.some((b) => b.age < 6) && s.awareness >= 20],
+    [
+      'aging-claim',
+      s.products.length > 0 &&
+        s.month >= 3 &&
+        s.batches.some((b) => b.age < 6) &&
+        s.awareness >= 20,
+    ],
     ['reservoir', stock / retail > 4 && s.month >= 3],
     ['park', s.month >= 6 && (s.capacity.production >= 12 || s.finance.debt >= 120)],
-    ['master', s.capacity.automation > 0 && s.month >= 4],
+    ['master', s.recipes.length > 0 && s.capacity.automation > 0 && s.month >= 4],
     ['collectible', s.products.some((p) => p.recipe.segment === '高端收藏') && s.awareness > 30],
-    ['crossover', s.month >= 7 && s.awareness < 65],
+    ['crossover', s.recipes.length > 0 && s.month >= 7 && s.awareness < 65],
     ['trust', s.month >= 12 && s.products.some((p) => p.recipe.aging >= 12)],
     ['overcapacity', s.month >= 18 && s.industry < 0.9],
     [
       'quality-incident',
-      s.month >= 8 && (s.qualityControl < 1 || s.products.some((p) => p.quality < 60)),
+      s.products.length > 0 &&
+        s.month >= 8 &&
+        (s.qualityControl < 1 || s.products.some((p) => p.quality < 60)),
     ],
   ];
   return rules.filter(([id, pass]) => pass && !seen.has(id)).map(([id]) => id);

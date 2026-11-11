@@ -60,7 +60,7 @@ export function OperatingChart({
   }));
   const preview = data.length
     ? data
-    : [{ 月份: '待结算', 营业收入: 0, 实际回款: 0, 终端动销: 0, 企业出货: 0, 渠道库存: 1600 }];
+    : [{ 月份: '待结算', 营业收入: 0, 实际回款: 0, 终端动销: 0, 企业出货: 0, 渠道库存: 0 }];
   return (
     <div className="operating-chart">
       <ResponsiveContainer width="100%" height="100%">

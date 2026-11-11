@@ -87,6 +87,8 @@ export function performAction(original: GameState, action: Action): ActionResult
           r.id = `recipe-${s.month}-${s.recipes.length + 1}`;
           s.recipes.push(r);
         }
+        if (!s.company.brand) s.company.brand = r.brand;
+        if (!s.company.product) s.company.product = r.name;
         message = `已归档“${r.name}”，配方设计投入 1.5 万元`;
         break;
       }
