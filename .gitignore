@@ -1,0 +1,10 @@
+node_modules/
+.npm-cache/
+dist/
+artifacts/
+*.tsbuildinfo
+*.local
+.sites-local/
+.env
+.env.*
+.openai/

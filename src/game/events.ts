@@ -1,0 +1,328 @@
+import type { EventDefinition, GameState } from './types';
+
+export const EVENTS: EventDefinition[] = [
+  {
+    id: 'aging-claim',
+    title: '三个月，窖藏十五年？',
+    subtitle: '时间可以被算法压缩吗',
+    department: '品牌部 / 研发部',
+    body: '年轻基酒占比上升，营销团队希望用“AI 陈化”抢占市场：“消费者听不懂酯化反应，但听得懂十五年。”研究员提醒，改善口感并不等于改变真实储存年份。',
+    choices: [
+      {
+        label: '如实标注，公布实验数据',
+        description: '投入 3 万，信誉 +6；放弃年份噱头。',
+        cost: 3,
+        reputation: 6,
+      },
+      {
+        label: '推出真实的新工艺产品',
+        description: '投入 8 万做验证，知名度 +4，信誉 +3。',
+        cost: 8,
+        awareness: 4,
+        reputation: 3,
+        science: 1,
+      },
+      {
+        label: '时间不够，概念来凑',
+        description: '短期热度 +18；虚假宣传风险 +28，后续可能罚款和退单。',
+        cost: 0,
+        hype: 18,
+        risk: 28,
+        reputation: -3,
+      },
+    ],
+  },
+  {
+    id: 'park',
+    title: '千亿酱酒产业园',
+    subtitle: '规划图里的产能已经领先全国',
+    department: '战略发展部',
+    body: '地方产业推介会上，团队建议把下一次扩建包装为“千亿级智能酱酒生态”。银行愿意给授信，但原料、人才和终端需求还没有跟上。',
+    choices: [
+      {
+        label: '按订单分期建设',
+        description: '投入 20 万优化车间，产能 +2 吨，信誉 +2。',
+        cost: 20,
+        expand: true,
+        reputation: 2,
+      },
+      {
+        label: '先签贷款，把规模做起来',
+        description: '借款 120 万并投入建设，产能 +8 吨；增加利息与折旧。',
+        cost: 0,
+        debt: 120,
+        expand: true,
+        hype: 10,
+      },
+      { label: '需求还没来，先不剪彩', description: '保留现金，信誉 +1。', cost: 0, reputation: 1 },
+    ],
+  },
+  {
+    id: 'reservoir',
+    title: '经销商蓄水池',
+    subtitle: '货进了仓库，酒没有上桌',
+    department: '销售部 / 财务部',
+    body: '经销商库存明显高于终端动销。销售部表示“回款只是时间问题”，经销商却开始申请延期，并准备低价清仓。漂亮的出货数字正在变成危险的应收账款。',
+    choices: [
+      {
+        label: '停止压货，补贴终端去库存',
+        description: '投入 10 万支持渠道，健康度恢复，促进当月终端动销。',
+        cost: 10,
+        reputation: 4,
+        demand: 0.65,
+        qualityFix: true,
+      },
+      {
+        label: '召开动员会，继续讲增长',
+        description: '热度 +6，信誉 -6；库存和应收仍留在渠道。',
+        cost: 0,
+        hype: 6,
+        reputation: -6,
+        risk: 8,
+      },
+      {
+        label: '承认调整期，帮助价格回归',
+        description: '信誉 +2，终端价格短期进一步下探。',
+        cost: 0,
+        reputation: 2,
+        demand: 0.2,
+        hype: -8,
+      },
+    ],
+  },
+  {
+    id: 'quantum',
+    title: 'AI 量子勾调技术',
+    subtitle: '算法还在调参，发布会已经定档',
+    department: '研究院 / 品牌部',
+    body: '风味实验已经有了初步数据。营销经理将内部规则模型命名为“全球领先的 AI 量子风味引擎”。研发人员翻遍代码，也没找到量子在哪里。',
+    choices: [
+      {
+        label: '预算投给真实研发',
+        description: '投入 8 万，实验数据 +2，信誉 +4。',
+        cost: 8,
+        science: 2,
+        reputation: 4,
+      },
+      {
+        label: '改名“风味数据辅助勾调”',
+        description: '投入 2 万做技术开放日，知名度 +3，信誉 +2。',
+        cost: 2,
+        awareness: 3,
+        reputation: 2,
+      },
+      {
+        label: '发布会的灯光不能白租',
+        description: '知名度 +12，热度 +12；宣传风险 +22。',
+        cost: 0,
+        awareness: 12,
+        hype: 12,
+        risk: 22,
+      },
+    ],
+  },
+  {
+    id: 'master',
+    title: '大师手工酿造',
+    subtitle: '自动化生产线旁的手工传承牌匾',
+    department: '生产部 / 品牌部',
+    body: '智能设备已经上线。品牌团队却准备在新包装上写“每一滴，皆为大师亲手酿造”。生产工程师看了看机械臂，又看了看大师。',
+    choices: [
+      {
+        label: '公开“匠心 + 智能”的真实工艺',
+        description: '投入 3 万，信誉 +6，知名度 +2。',
+        cost: 3,
+        reputation: 6,
+        awareness: 2,
+      },
+      {
+        label: '保留大师监制，撤去纯手工字样',
+        description: '如实说明生产过程，信誉 +2。',
+        cost: 0,
+        reputation: 2,
+      },
+      {
+        label: '消费者买的是故事',
+        description: '热度 +10，宣传风险 +25。',
+        cost: 0,
+        hype: 10,
+        risk: 25,
+      },
+    ],
+  },
+  {
+    id: 'collectible',
+    title: '酒还没开，价格先飞了',
+    subtitle: '白酒金融化',
+    department: '典藏事业部',
+    body: '你的收藏产品被二级市场资金盯上。几位酒商希望联手“维护稀缺性”，将价格故事变成新的增长引擎。没有开瓶的酒，也能成为收益率曲线。',
+    choices: [
+      {
+        label: '限购并强调饮用价值',
+        description: '信誉 +5，热度下降 4；减少投机依赖。',
+        cost: 0,
+        reputation: 5,
+        hype: -4,
+      },
+      {
+        label: '联合举办收藏交易盛典',
+        description: '投入 12 万，热度 +25，投机及舆情风险 +25。',
+        cost: 12,
+        hype: 25,
+        risk: 25,
+        awareness: 8,
+      },
+      {
+        label: '发布风险说明，维持正常供货',
+        description: '投入 2 万，信誉 +3。',
+        cost: 2,
+        reputation: 3,
+      },
+    ],
+  },
+  {
+    id: 'crossover',
+    title: '下一个风口，酱香万物',
+    subtitle: '咖啡、冰淇淋，还是月饼',
+    department: '品牌创新部',
+    body: '传统市场增长放缓，品牌团队提交了五份跨界提案。共同点是海报非常好看，复购预测那一栏都写着“待验证”。',
+    choices: [
+      {
+        label: '小范围推出酱香咖啡',
+        description: '投入 5 万验证需求，知名度 +5，短期动销 +10%。',
+        cost: 5,
+        awareness: 5,
+        demand: 0.1,
+      },
+      {
+        label: '全面铺开，承包热搜',
+        description: '投入 18 万，知名度 +15，热度 +8；利润没有保证。',
+        cost: 18,
+        awareness: 15,
+        hype: 8,
+      },
+      { label: '先把主业这杯酒酿好', description: '不增加预算，信誉 +1。', cost: 0, reputation: 1 },
+    ],
+  },
+  {
+    id: 'trust',
+    title: '年份酒信任危机',
+    subtitle: '“年份”两个字，开始变得昂贵',
+    department: '质量部 / 公共关系部',
+    body: '虚构同行“雾峰酒业”的年份标注争议引发行业讨论。消费者要求你解释：酒龄如何计算、用了哪些批次、生产记录能否核验？',
+    choices: [
+      {
+        label: '上线批次追溯与公开检测',
+        description: '投入 10 万，建立追溯，信誉 +9，后续质量风险下降。',
+        cost: 10,
+        trace: true,
+        reputation: 9,
+      },
+      {
+        label: '主动撤去含糊年份宣传',
+        description: '信誉 +3，短期热度 -4。',
+        cost: 0,
+        reputation: 3,
+        hype: -4,
+        risk: -12,
+      },
+      {
+        label: '继续强调“老酒风味”',
+        description: '保留热度；信誉 -6，监管风险 +18。',
+        cost: 0,
+        reputation: -6,
+        risk: 18,
+      },
+    ],
+  },
+  {
+    id: 'overcapacity',
+    title: '酱酒热，终于酿成了库存',
+    subtitle: '产能过剩周期',
+    department: '行业观察室',
+    body: '前几年开工的酒厂陆续投产。虚构竞争者“赤岭”“云麓”开始以价换量，渠道接到的招商电话比消费者进店次数还多。行业需求没有跟着厂房面积增长。',
+    choices: [
+      {
+        label: '收缩投放，服务核心渠道',
+        description: '投入 5 万，信誉 +4，改善渠道健康度。',
+        cost: 5,
+        reputation: 4,
+        qualityFix: true,
+      },
+      {
+        label: '低价抢量，争夺有限需求',
+        description: '本月动销 +50%，热度 -5；打价格战会压缩成交价。',
+        cost: 0,
+        demand: 0.5,
+        hype: -5,
+        reputation: -2,
+      },
+      {
+        label: '继续储酒，等待下一个周期',
+        description: '保留资金；仓储成本和需求压力仍会持续。',
+        cost: 0,
+        reputation: 1,
+      },
+    ],
+  },
+  {
+    id: 'quality-incident',
+    title: '一批酒，把所有报表叫停',
+    subtitle: '批次质量异常',
+    department: '质量控制中心',
+    body: '检测员报告一批产品风味异常，可能来自菌群漂移或储存管理疏漏。是否达到召回程度尚需复检，但等待期间市场仍会继续销售。',
+    choices: [
+      {
+        label: '主动召回、停线排查并公开',
+        description: '投入 18 万整改，召回部分库存；信誉 +5，长期风险下降。',
+        cost: 18,
+        qualityFix: true,
+        reputation: 5,
+        risk: -20,
+      },
+      {
+        label: '隔离库存，第三方复检',
+        description: '投入 8 万，销毁部分异常库存，信誉 -3，降低风险。',
+        cost: 8,
+        qualityFix: true,
+        reputation: -3,
+        risk: -8,
+      },
+      {
+        label: '先发货，再等调查结果',
+        description: '不支出现金；信誉 -12，后续事故与监管风险 +40。',
+        cost: 0,
+        reputation: -12,
+        risk: 40,
+      },
+    ],
+  },
+];
+export const eventById = (id: string) => EVENTS.find((e) => e.id === id)!;
+export function eligibleEvents(s: GameState): string[] {
+  const seen = new Set([...s.eventHistory.map((e) => e.id), ...s.events.map((e) => e.id)]);
+  const stock = s.dealers.reduce((v, d) => v + d.lots.reduce((n, l) => n + l.bottles, 0), 0);
+  const retail = Math.max(
+    300,
+    s.dealers.reduce((v, d) => v + d.soldLast, 0),
+  );
+  const rules: [string, boolean][] = [
+    [
+      'quantum',
+      s.month >= 2 && (s.experimentCount > 0 || s.research.some((r) => r.active || r.stage > 0)),
+    ],
+    ['aging-claim', s.month >= 3 && s.batches.some((b) => b.age < 6) && s.awareness >= 20],
+    ['reservoir', stock / retail > 4 && s.month >= 3],
+    ['park', s.month >= 6 && (s.capacity.production >= 12 || s.finance.debt >= 120)],
+    ['master', s.capacity.automation > 0 && s.month >= 4],
+    ['collectible', s.products.some((p) => p.recipe.segment === '高端收藏') && s.awareness > 30],
+    ['crossover', s.month >= 7 && s.awareness < 65],
+    ['trust', s.month >= 12 && s.products.some((p) => p.recipe.aging >= 12)],
+    ['overcapacity', s.month >= 18 && s.industry < 0.9],
+    [
+      'quality-incident',
+      s.month >= 8 && (s.qualityControl < 1 || s.products.some((p) => p.quality < 60)),
+    ],
+  ];
+  return rules.filter(([id, pass]) => pass && !seen.has(id)).map(([id]) => id);
+}
