@@ -138,7 +138,7 @@ export function validateState(value: unknown): asserts value is GameState {
     throw new Error('资产或人员数据无效');
   if (
     !array(s.recipes, 20) ||
-    !array(s.products, 20) ||
+    !array(s.products, 60) ||
     !array(s.batches, 5000) ||
     !array(s.jobs, 500) ||
     !array(s.dealers, 12) ||

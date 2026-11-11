@@ -1,4 +1,4 @@
-import { FLAVORS, SEGMENTS } from './data';
+import { FLAVORS, PACKAGING, SEGMENTS } from './data';
 import { clamp, round } from './random';
 import type { Batch, Flavor, GameState, Recipe } from './types';
 
@@ -98,7 +98,7 @@ export function forecast(recipe: Recipe, s: GameState) {
         ) / weight;
       f[key] = round(clamp(f[key] + clamp(residual * 0.3, -3, 3), 10, 98), 1);
     }
-  const packaging = { 简装: 5, 雅致: 16, 典藏: 48 }[recipe.packaging];
+  const packaging = PACKAGING[recipe.packaging].cost;
   const raw = 25 + recipe.cut * 0.22 + recipe.fermentation * 2 + recipe.aging * 0.18;
   const unitCost = round(raw + packaging + 5);
   const uncertainty = Math.max(

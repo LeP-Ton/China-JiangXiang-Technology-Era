@@ -2,7 +2,11 @@ import type { ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight, ChevronRight, Info, Sparkles } from 'lucide-react';
 import type { Action, ActionResult, GameState } from '../game/types';
 
-export type Navigate = (page: string) => void;
+export interface NavigationSelection {
+  recipeId?: string;
+  productId?: string;
+}
+export type Navigate = (page: string, selection?: NavigationSelection) => void;
 export function ProductSetupPrompt({
   onStart,
   title = '先决定，你要酿一款什么酒',
@@ -30,6 +34,7 @@ export interface PanelProps {
   s: GameState;
   act: (action: Action) => ActionResult;
   navigate: Navigate;
+  selection?: NavigationSelection;
 }
 export const money = (n: number, digits = 2) =>
   n.toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits });

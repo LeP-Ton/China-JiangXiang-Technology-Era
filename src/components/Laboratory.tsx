@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Beaker, FlaskConical, Plus, Save } from 'lucide-react';
-import { DEFAULT_RECIPE, FLAVORS, SEGMENTS } from '../game/data';
+import { DEFAULT_RECIPE, FLAVORS, PACKAGING, SEGMENTS } from '../game/data';
 import { forecast } from '../game/flavor';
 import type { Recipe, Segment } from '../game/types';
 import { FlavorChart } from './Charts';
@@ -8,13 +8,12 @@ import { Badge, Field, money, PageTitle, Panel, Progress, Tip } from './shared';
 import type { PanelProps } from './shared';
 import WineBottle from './WineBottle';
 
-export default function Laboratory({ s, act }: PanelProps) {
+export default function Laboratory({ s, act, selection }: PanelProps) {
+  const selectedRecipe = s.recipes.find((r) => r.id === selection?.recipeId) ?? s.recipes[0];
   const [r, setR] = useState<Recipe>(
-    s.recipes[0] ? { ...s.recipes[0] } : { ...DEFAULT_RECIPE, id: 'new', name: '', brand: '' },
+    selectedRecipe ? { ...selectedRecipe } : { ...DEFAULT_RECIPE, id: 'new', name: '', brand: '' },
   );
-  const [preview, setPreview] = useState<'flavor' | 'bottle'>(
-    s.recipes.length ? 'flavor' : 'bottle',
-  );
+  const [preview, setPreview] = useState<'flavor' | 'bottle'>('bottle');
   const prediction = forecast(r, s);
   const update = (key: keyof Recipe, value: string | number) =>
     setR((old) => ({ ...old, [key]: value }));
@@ -145,9 +144,15 @@ export default function Laboratory({ s, act }: PanelProps) {
                 ))}
               </select>
             </Field>
-            <Field label="包装定位">
-              <select value={r.packaging} onChange={(e) => update('packaging', e.target.value)}>
-                {['简装', '雅致', '典藏'].map((x) => (
+            <Field label="包装定位" hint={PACKAGING[r.packaging].description}>
+              <select
+                value={r.packaging}
+                onChange={(e) => {
+                  update('packaging', e.target.value);
+                  setPreview('bottle');
+                }}
+              >
+                {Object.keys(PACKAGING).map((x) => (
                   <option key={x}>{x}</option>
                 ))}
               </select>
@@ -244,7 +249,7 @@ export default function Laboratory({ s, act }: PanelProps) {
                   logo={s.company.logo}
                   packaging={r.packaging}
                 />
-                <small>设计效果预览 · 尚未生产</small>
+                <small>{r.packaging} · 保存后可在产品设计档案中查看</small>
               </div>
             )}
             <div className="lab-scores">
@@ -278,6 +283,10 @@ export default function Laboratory({ s, act }: PanelProps) {
             </div>
           </Panel>
           <Panel title="商业可行性">
+            <div className="fact-row">
+              <span>{r.packaging}包装材料成本</span>
+              <strong>¥ {PACKAGING[r.packaging].cost} / 瓶</strong>
+            </div>
             <div className="fact-row">
               <span>预测单瓶完整成本</span>
               <strong>¥ {money(prediction.unitCost)}</strong>

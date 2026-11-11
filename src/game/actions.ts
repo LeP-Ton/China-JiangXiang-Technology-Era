@@ -2,6 +2,7 @@ import {
   CAMPAIGNS,
   FACILITIES,
   FLAVORS,
+  PACKAGING,
   REGIONS,
   RESEARCH_COST,
   ROLES,
@@ -207,7 +208,7 @@ export function performAction(original: GameState, action: Action): ActionResult
         const totalTons = batches.reduce((v, b) => v + b.tons, 0);
         if (totalTons + 0.000001 < tons)
           throw new Error(`所选基酒不足，需要含损耗 ${round(tons, 3)} 吨`);
-        const packageCost = { 简装: 5, 雅致: 16, 典藏: 48 }[r.packaging];
+        const packageCost = PACKAGING[r.packaging].cost;
         const bottling = (hasTech(s, 'bottling') ? 4 : 5) + packageCost;
         spend(s, (action.bottles * bottling) / 10000, 'asset');
         let cost = (action.bottles * bottling) / 10000;
@@ -230,7 +231,10 @@ export function performAction(original: GameState, action: Action): ActionResult
         const shortfall = Math.max(0, r.aging - avgAge);
         f['协调性'] = clamp(f['协调性'] - shortfall * 0.35);
         const quality = qualityScore(f);
-        const existing = s.products.find((p) => p.recipe.id === r.id);
+        // 已灌装成品保留实际包装，改版后另建库存，不能给旧酒凭空换瓶。
+        const existing = s.products.find(
+          (p) => p.recipe.id === r.id && p.recipe.packaging === r.packaging,
+        );
         if (existing) {
           const old = existing.stock;
           const all = old + action.bottles;
@@ -244,7 +248,7 @@ export function performAction(original: GameState, action: Action): ActionResult
           existing.lastAge = round(avgAge, 1);
         } else
           s.products.push({
-            id: `product-${r.id}`,
+            id: `product-${r.id}-${r.packaging}`,
             recipe: { ...r },
             flavor: f,
             quality,

@@ -122,6 +122,36 @@ test('勾调实际消耗基酒与包装费，守恒成品成本', () => {
   assert.equal(s.products[0].stock, 3200);
 });
 
+test('包装改版保留旧成品，新包装独立灌装、发货和存档', () => {
+  let s = fresh();
+  const original = structuredClone(s.products[0]);
+  const recipeId = s.recipes[0].id;
+  s = action(s, { type: 'recipe', recipe: { ...s.recipes[0], packaging: '简装' } });
+  assert.deepEqual(s.products[0], original);
+  const cash = s.finance.cash;
+  s = action(s, { type: 'blend', recipeId, batchIds: ['batch-2'], bottles: 2000 });
+  assert.equal(s.products.length, 2);
+  assert.deepEqual(s.products[0], original);
+  const simple = s.products.find((p) => p.recipe.packaging === '简装')!;
+  assert.equal(simple.stock, 2000);
+  assert.equal(cash - s.finance.cash, 2);
+  s = action(s, {
+    type: 'ship',
+    dealerId: 'dealer-1',
+    productId: simple.id,
+    bottles: 500,
+    credit: false,
+  });
+  assert.equal(s.products.find((p) => p.id === simple.id)!.stock, 1500);
+  assert.ok(s.dealers[0].lots.some((l) => l.productId === simple.id && l.bottles === 500));
+  s = action(s, { type: 'recipe', recipe: { ...s.recipes[0], packaging: '雅致' } });
+  s = action(s, { type: 'blend', recipeId, batchIds: ['batch-2'], bottles: 1000 });
+  assert.equal(s.products.length, 2);
+  assert.equal(s.products[0].stock, 4200);
+  assert.equal(s.products.find((p) => p.id === simple.id)!.stock, 1500);
+  assert.deepEqual(deserializeGame(serializeGame(s)).state, s);
+});
+
 test('高端产品不能用年轻基酒制造；灌装、仓容与原料受约束', () => {
   let s = fresh();
   s.recipes[0].segment = '高端收藏';

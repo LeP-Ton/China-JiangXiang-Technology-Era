@@ -24,6 +24,7 @@ import {
 } from './shared';
 import type { PanelProps } from './shared';
 import WineBottle from './WineBottle';
+import ProductAppearance from './ProductAppearance';
 
 function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
   const [price, setPrice] = useState(String(p.recipe.price));
@@ -83,7 +84,7 @@ function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
         >
           <Field label="建议零售价 / 元">
             <input
-              aria-label={`${p.recipe.name}零售价`}
+              aria-label={`${p.recipe.name}${p.recipe.packaging}包装零售价`}
               type="number"
               min={39}
               max={1999}
@@ -96,14 +97,14 @@ function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
           </button>
         </form>
         <div className="button-row">
-          <button className="primary" onClick={() => navigate('dealers')}>
+          <button className="primary" onClick={() => navigate('dealers', { productId: p.id })}>
             安排渠道发货
             <ArrowRight size={14} />
           </button>
           <button
             className="secondary"
             disabled={s.actions < 1}
-            onClick={() => navigate('storage')}
+            onClick={() => navigate('storage', { recipeId: p.recipe.id })}
           >
             继续勾调
           </button>
@@ -135,33 +136,44 @@ export function Products(props: PanelProps) {
           <ProductSetupPrompt onStart={() => props.navigate('lab')} />
         </Panel>
       )}
-      {props.s.recipes.some((r) => !props.s.products.some((p) => p.recipe.id === r.id)) && (
+      {props.s.recipes.length > 0 && (
         <Panel
-          title="已归档的产品方案"
-          extra={<Badge tone="amber">配方已建立 · 尚未形成成品</Badge>}
+          title="产品设计档案"
+          extra={<Badge tone="gray">{props.s.recipes.length} 款方案 · 包装持续留档</Badge>}
         >
-          {props.s.recipes
-            .filter((r) => !props.s.products.some((p) => p.recipe.id === r.id))
-            .map((r) => (
-              <div className="unbottled-recipe" key={r.id}>
-                <div>
-                  <small>
-                    {r.brand} / {r.segment}
-                  </small>
-                  <h3>{r.name}</h3>
-                  <p>确定工艺只是开始，实际勾调灌装后才会进入成品库。</p>
-                </div>
-                <div className="button-row">
-                  <button className="secondary" onClick={() => props.navigate('production')}>
-                    组织生产
-                  </button>
-                  <button className="primary" onClick={() => props.navigate('storage')}>
-                    勾调灌装
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
+          <p className="appearance-archive-note">
+            设计归档后即可查看包装。下方可售成品按实际灌装时的包装展示；更改方案不会给已有库存换瓶。
+          </p>
+          {props.s.recipes.map((r) => (
+            <div className="unbottled-recipe" key={r.id}>
+              <ProductAppearance
+                recipe={r}
+                company={props.s.company}
+                note={`${r.segment} · ${props.s.products.some((p) => p.recipe.id === r.id && p.recipe.packaging === r.packaging) ? '此包装已投产' : '设计方案，尚未灌装'}`}
+              />
+              <div className="button-row">
+                <button
+                  className="text-button"
+                  onClick={() => props.navigate('lab', { recipeId: r.id })}
+                >
+                  编辑方案
+                </button>
+                <button
+                  className="secondary"
+                  onClick={() => props.navigate('production', { recipeId: r.id })}
+                >
+                  组织生产
+                </button>
+                <button
+                  className="primary"
+                  onClick={() => props.navigate('storage', { recipeId: r.id })}
+                >
+                  勾调灌装
+                  <ArrowRight size={14} />
+                </button>
               </div>
-            ))}
+            </div>
+          ))}
         </Panel>
       )}
       <div className="products-grid">
@@ -173,12 +185,13 @@ export function Products(props: PanelProps) {
   );
 }
 
-export function Dealers({ s, act, navigate }: PanelProps) {
+export function Dealers({ s, act, navigate, selection }: PanelProps) {
   const [dealer, setDealer] = useState(s.dealers[0].id);
-  const [product, setProduct] = useState(s.products[0]?.id ?? '');
+  const [product, setProduct] = useState(selection?.productId ?? s.products[0]?.id ?? '');
   const [bottles, setBottles] = useState(1000);
   const [credit, setCredit] = useState(false);
   const [region, setRegion] = useState('华东');
+  const selectedProduct = s.products.find((p) => p.id === product);
   return (
     <>
       <PageTitle
@@ -289,12 +302,19 @@ export function Dealers({ s, act, navigate }: PanelProps) {
                   <select value={product} onChange={(e) => setProduct(e.target.value)}>
                     {s.products.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.recipe.name} · 余 {p.stock} 瓶
+                        {p.recipe.name} · {p.recipe.packaging} · 余 {p.stock} 瓶
                       </option>
                     ))}
                   </select>
                 </Field>
               </div>
+              {selectedProduct && (
+                <ProductAppearance
+                  recipe={selectedProduct.recipe}
+                  company={s.company}
+                  note={`实际成品包装 · 可发货 ${num(selectedProduct.stock)} 瓶`}
+                />
+              )}
               <Field label="出货数量 / 瓶">
                 <input
                   type="number"
@@ -446,7 +466,9 @@ export function Marketing({ s, act }: PanelProps) {
             <tbody>
               {s.products.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.recipe.name}</td>
+                  <td>
+                    <ProductAppearance recipe={p.recipe} company={s.company} compact />
+                  </td>
                   <td>{p.recipe.segment}</td>
                   <td>{p.quality.toFixed(1)}</td>
                   <td>

@@ -40,6 +40,7 @@ import Research from './components/Research';
 import Setup from './components/Setup';
 import { CompanyIdentity, CompanyMark } from './components/BrandIdentity';
 import { Badge, money, num, Progress } from './components/shared';
+import type { NavigationSelection } from './components/shared';
 
 const NAV = [
   { id: 'dashboard', name: 'CEO 经营驾驶舱', icon: LayoutDashboard, group: '经营决策' },
@@ -86,6 +87,7 @@ function GameApp() {
     }
   });
   const [page, setPage] = useState('dashboard');
+  const [selection, setSelection] = useState<NavigationSelection>({});
   const [creating, setCreating] = useState(false);
   const [toast, setToast] = useState<{ text: string; ok: boolean } | null>(null);
   const [summary, setSummary] = useState<MonthRecord | null>(null);
@@ -148,8 +150,9 @@ function GameApp() {
       if (previous?.isConnected) previous.focus();
     };
   }, [summary, help, game?.gameOver, game?.milestoneSeen, page]);
-  const navigate = (id: string) => {
+  const navigate = (id: string, target: NavigationSelection = {}) => {
     setPage(id);
+    setSelection(target);
     setMenu(false);
     main.current?.scrollTo({ top: 0 });
   };
@@ -179,7 +182,7 @@ function GameApp() {
     } else notify(result.message, false);
   };
   const score = game ? scoreCompany(game) : null;
-  const props = game ? { s: game, act, navigate } : null;
+  const props = game ? { s: game, act, navigate, selection } : null;
   const pages: Record<string, ReactNode> = props
     ? {
         dashboard: <Dashboard {...props} />,

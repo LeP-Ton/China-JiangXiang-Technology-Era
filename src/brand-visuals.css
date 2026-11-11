@@ -48,6 +48,81 @@
   border-bottom: 0;
   padding-bottom: 0;
 }
+.product-appearance {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  margin: 12px 0;
+}
+.appearance-bottle-scene {
+  display: grid;
+  place-items: center;
+  flex: 0 0 88px;
+  height: 126px;
+  border-radius: 5px;
+  background: radial-gradient(ellipse at 40% 25%, #fffef7, #edf0e4);
+}
+.appearance-bottle-scene > .crafted-bottle {
+  width: 66px;
+  height: 123px;
+}
+.appearance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.appearance-details > small {
+  font-size: 10px;
+  color: #8b9c7d;
+}
+.appearance-details > strong {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: #6b8058;
+  line-height: 1.6;
+}
+.appearance-details > span,
+.appearance-details > em,
+.appearance-archive-note {
+  font-size: 10px;
+  line-height: 1.8;
+  color: #8d9e7c;
+  font-style: normal;
+}
+.appearance-archive-note {
+  margin-top: -3px;
+}
+.appearance-compact {
+  gap: 10px;
+  margin: 0;
+  min-width: 190px;
+}
+.appearance-compact .appearance-bottle-scene {
+  flex-basis: 44px;
+  height: 67px;
+}
+.appearance-compact .crafted-bottle {
+  width: 36px;
+  height: 67px;
+}
+.appearance-compact .appearance-details {
+  gap: 4px;
+}
+.appearance-compact .appearance-details > strong {
+  font-size: 13px;
+}
+.appearance-compact .appearance-details > small,
+.appearance-compact .appearance-details > em {
+  font-size: 9px;
+}
+.unbottled-recipe > .product-appearance {
+  flex: 1;
+  margin: 0;
+}
 .unbottled-recipe small {
   font-size: 10px;
   color: #8da077;
@@ -357,10 +432,16 @@
   color: #c4ab70;
 }
 .bottle-simple .bottle-brand-inscription {
-  fill: #8a6954;
+  fill: #363e32;
+  filter: none;
 }
 .bottle-simple .bottle-emblem {
-  color: #a38361;
+  color: #994738;
+}
+.bottle-simple .bottle-product-inscription,
+.bottle-simple .bottle-category,
+.bottle-simple .bottle-maker {
+  fill: #5f6858;
 }
 .setup-story .bottle-scene {
   height: 390px;
@@ -476,11 +557,15 @@
   letter-spacing: 1px;
   z-index: 1;
 }
-.product-visual.packaging-典藏 {
+.product-visual.packaging-典藏,
+.lab-packaging-preview.packaging-典藏,
+.appearance-bottle-scene.packaging-典藏 {
   background: radial-gradient(ellipse at 39% 20%, #edf1e4, #dfe8d4 55%, #d0ddc6);
 }
-.product-visual.packaging-简装 {
-  background: radial-gradient(ellipse at 40% 20%, #fffdf4, #f3eee0 65%, #eae2cd);
+.product-visual.packaging-简装,
+.lab-packaging-preview.packaging-简装,
+.appearance-bottle-scene.packaging-简装 {
+  background: radial-gradient(ellipse at 40% 20%, #fcfdf9, #ebf0e9 65%, #dce6dc);
 }
 .product-visual.packaging-简装 .product-watermark {
   color: #e4d9bc;

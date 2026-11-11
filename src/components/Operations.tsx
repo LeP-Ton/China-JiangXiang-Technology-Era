@@ -17,13 +17,15 @@ import {
   Tip,
 } from './shared';
 import type { PanelProps } from './shared';
+import ProductAppearance from './ProductAppearance';
 
-export function Production({ s, act, navigate }: PanelProps) {
-  const [recipe, setRecipe] = useState(s.recipes[0]?.id ?? '');
+export function Production({ s, act, navigate, selection }: PanelProps) {
+  const [recipe, setRecipe] = useState(selection?.recipeId ?? s.recipes[0]?.id ?? '');
   const [tons, setTons] = useState(3);
   const [procurement, setProcurement] = useState(5);
   const occupied = s.jobs.reduce((v, j) => v + j.tons, 0);
   const capacity = productionCapacity(s);
+  const selectedRecipe = s.recipes.find((r) => r.id === recipe);
   return (
     <>
       <PageTitle
@@ -65,6 +67,13 @@ export function Production({ s, act, navigate }: PanelProps) {
                   ))}
                 </select>
               </Field>
+              {selectedRecipe && (
+                <ProductAppearance
+                  recipe={selectedRecipe}
+                  company={s.company}
+                  note="生产目标包装 · 基酒酿成后仍需勾调灌装"
+                />
+              )}
               <Field label="计划基酒产量（吨）" hint="实际出酒量受工艺与已部署技术影响。">
                 <input
                   type="number"
@@ -152,8 +161,12 @@ export function Production({ s, act, navigate }: PanelProps) {
                 {s.jobs.map((j) => (
                   <tr key={j.id}>
                     <td>
-                      <strong>{j.recipe.name}</strong>
-                      <small>{j.process}</small>
+                      <ProductAppearance
+                        recipe={j.recipe}
+                        company={s.company}
+                        compact
+                        note={`生产目标 · ${j.process}`}
+                      />
                     </td>
                     <td>{num(j.tons, 1)} 吨</td>
                     <td>
@@ -217,9 +230,9 @@ export function Production({ s, act, navigate }: PanelProps) {
   );
 }
 
-export function StorageCenter({ s, act, navigate }: PanelProps) {
+export function StorageCenter({ s, act, navigate, selection }: PanelProps) {
   const [selected, setSelected] = useState<string[]>([]);
-  const [recipe, setRecipe] = useState(s.recipes[0]?.id ?? '');
+  const [recipe, setRecipe] = useState(selection?.recipeId ?? s.recipes[0]?.id ?? '');
   const [bottles, setBottles] = useState(2000);
   const total = baseStock(s);
   const aged = s.batches.filter((b) => b.age >= 12).reduce((v, b) => v + b.tons, 0);
@@ -344,6 +357,11 @@ export function StorageCenter({ s, act, navigate }: PanelProps) {
                   />
                 </Field>
               </div>
+              <ProductAppearance
+                recipe={r}
+                company={s.company}
+                note="目标成品包装 · 按此方案勾调灌装后入库"
+              />
               <div className="fact-row">
                 <span>已选 {picked.length} 批基酒</span>
                 <strong>{num(pickedTons, 3)} 吨</strong>

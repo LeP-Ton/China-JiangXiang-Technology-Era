@@ -254,6 +254,11 @@ export const FACILITIES = {
     detail: '提高有效产能和批次稳定性，同时削弱手工酿造宣传的可信度。',
   },
 };
+export const PACKAGING: Record<Recipe['packaging'], { cost: number; description: string }> = {
+  简装: { cost: 5, description: '透明长颈玻璃 · 银色旋盖 · 素纸酒标' },
+  雅致: { cost: 16, description: '温润白瓷 · 金色封盖 · 压纹酒标' },
+  典藏: { cost: 48, description: '深翠釉面 · 金色封盖 · 描金酒标' },
+};
 export const DEFAULT_RECIPE: Recipe = {
   id: 'recipe-1',
   name: '初酿·经典',
