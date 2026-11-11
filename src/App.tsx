@@ -38,6 +38,7 @@ import { Finance, News, People } from './components/Management';
 import { Production, StorageCenter } from './components/Operations';
 import Research from './components/Research';
 import Setup from './components/Setup';
+import { CompanyIdentity, CompanyMark } from './components/BrandIdentity';
 import { Badge, money, num, Progress } from './components/shared';
 
 const NAV = [
@@ -214,23 +215,17 @@ function GameApp() {
         <div className="app-shell">
           <aside className={`sidebar ${menu ? 'open' : ''}`}>
             <div className="sidebar-brand">
-              <div className="brand-seal">酱</div>
-              <div>
-                <strong>中国酱香科技时代</strong>
-                <small>JIANGXIANG TECHNOLOGY ERA</small>
-              </div>
+              <CompanyIdentity
+                name={game.company.name}
+                logo={game.company.logo}
+                variant="sidebar"
+              />
               <button className="mobile-only" aria-label="关闭菜单" onClick={() => setMenu(false)}>
                 <X size={20} />
               </button>
             </div>
             <div className="enterprise-card">
-              <div className="company-logo">
-                {game.company.logo.startsWith('data:') ? (
-                  <img src={game.company.logo} alt="企业标识" />
-                ) : (
-                  game.company.logo
-                )}
-              </div>
+              <CompanyMark logo={game.company.logo} name={game.company.name} />
               <div>
                 <strong>{game.company.name}</strong>
                 <small>{game.company.direction} · 地方酒厂起步</small>

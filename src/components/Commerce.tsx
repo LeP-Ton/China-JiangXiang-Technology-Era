@@ -12,18 +12,28 @@ import type { Product } from '../game/types';
 import { OperatingChart } from './Charts';
 import { Badge, Field, Metric, money, num, PageTitle, Panel, Progress, Tip } from './shared';
 import type { PanelProps } from './shared';
+import WineBottle from './WineBottle';
 
 function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
   const [price, setPrice] = useState(String(p.recipe.price));
   return (
     <Panel className="product-card">
-      <div className="product-visual">
-        <div className="mini-bottle">
-          <span>{p.recipe.brand.slice(0, 2)}</span>
-          <small>酱香型白酒</small>
+      <div className={`product-visual packaging-${p.recipe.packaging}`}>
+        <div className="product-scene-caption" aria-hidden="true">
+          <span>{p.recipe.brand}</span>
+          <small>JIANGXIANG COLLECTION</small>
         </div>
+        <WineBottle
+          className="product-bottle"
+          brand={p.recipe.brand}
+          product={p.recipe.name}
+          company={s.company.name}
+          logo={s.company.logo}
+          packaging={p.recipe.packaging}
+        />
         <span className="product-watermark">酿</span>
         <Badge tone="gray">{p.recipe.packaging}包装</Badge>
+        <span className="product-volume">酱香型白酒 · 500 mL</span>
       </div>
       <div className="product-details">
         <div className="eyebrow">

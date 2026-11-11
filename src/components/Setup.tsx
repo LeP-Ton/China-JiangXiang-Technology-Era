@@ -3,6 +3,8 @@ import { ArrowRight, Check, FlaskConical, Mountain, ShieldCheck, Upload, Wine } 
 import { DIRECTIONS } from '../game/data';
 import type { Company, Direction } from '../game/types';
 import { Field } from './shared';
+import { COMPANY_EMBLEMS, CompanyIdentity, CompanyMark } from './BrandIdentity';
+import WineBottle from './WineBottle';
 
 export default function Setup({
   onCreate,
@@ -22,12 +24,7 @@ export default function Setup({
   return (
     <div className="setup-page">
       <div className="setup-story">
-        <div className="wordmark">
-          <span className="brand-seal">酱</span>
-          <div>
-            中国酱香科技时代<small>CHINA JIANGXIANG TECHNOLOGY ERA</small>
-          </div>
-        </div>
+        <CompanyIdentity name={name} logo={logo} />
         <div className="setup-story-content">
           <span className="setup-kicker">一家酒厂，无数种未来</span>
           <h1>
@@ -48,17 +45,13 @@ export default function Setup({
             <div className="scene-mountain">
               <Mountain size={210} strokeWidth={0.5} />
             </div>
-            <div className="wine-bottle">
-              <div className="bottle-cap" />
-              <div className="bottle-neck" />
-              <div className="bottle-body">
-                <span>
-                  观<br />山
-                </span>
-                <small>酱香 · 时间之作</small>
-                <i>始于选择　成于坚守</i>
-              </div>
-            </div>
+            <WineBottle
+              className="setup-bottle"
+              brand={brand}
+              product={product}
+              company={name}
+              logo={logo}
+            />
             <div className="bottle-caption">以科技见风味 · 以时间见真章</div>
           </div>
         </div>
@@ -83,26 +76,31 @@ export default function Setup({
           <h2>创立你的酱酒企业</h2>
           <p className="muted">第一步，从一个值得被记住的名字开始。</p>
           <div className="setup-logo-row">
-            <div className="company-logo large">
-              {logo.startsWith('data:') ? <img src={logo} alt="企业标识" /> : logo}
-            </div>
+            <CompanyMark logo={logo} name={name} />
             <div>
               <span className="field-label">企业标识</span>
               <div className="logo-options">
-                {['山', '酱', '谷', '醴'].map((l) => (
+                {COMPANY_EMBLEMS.map((emblem) => (
                   <button
                     type="button"
-                    key={l}
-                    className={logo === l ? 'selected' : ''}
-                    onClick={() => setLogo(l)}
+                    key={emblem.value}
+                    className={logo === emblem.value ? 'selected' : ''}
+                    aria-label={`选择${emblem.name}企业标识`}
+                    aria-pressed={logo === emblem.value}
+                    title={`${emblem.name} · ${emblem.detail}`}
+                    onClick={() => setLogo(emblem.value)}
                   >
-                    {l}
+                    <CompanyMark logo={emblem.value} name={emblem.name} />
                   </button>
                 ))}
                 <button type="button" onClick={() => upload.current?.click()} title="上传企业标识">
                   <Upload size={14} />
                 </button>
               </div>
+              <p className="emblem-description">
+                {COMPANY_EMBLEMS.find((emblem) => emblem.value === logo)?.detail ??
+                  '已上传专属企业标识'}
+              </p>
               <input
                 ref={upload}
                 type="file"

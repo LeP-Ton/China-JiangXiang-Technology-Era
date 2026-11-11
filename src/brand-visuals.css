@@ -1,0 +1,614 @@
+.corporate-identity {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+  position: relative;
+  color: #e4d4a5;
+}
+.corporate-mark {
+  width: 58px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+  filter: drop-shadow(0 2px 2px #081a1826);
+}
+.corporate-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.corporate-mark img {
+  display: block;
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+}
+.corporate-mark.custom-mark {
+  border: 1px solid #c2b07a55;
+  border-radius: 8px;
+  background: #ffffff0a;
+}
+.corporate-wordmark {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  min-width: 0;
+  text-align: center;
+}
+.corporate-wordmark > strong {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 650;
+  font-size: 26px;
+  letter-spacing: 5px;
+  color: inherit;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 0 #ffffff16;
+}
+.corporate-wordmark > strong.long-company-name {
+  font-size: 18px;
+  letter-spacing: 2px;
+  max-width: 290px;
+}
+.corporate-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 7px;
+  font-size: 7px;
+  letter-spacing: 2px;
+  color: #b8ac83;
+  white-space: nowrap;
+}
+.corporate-rule i {
+  display: block;
+  width: 21px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #a99c6e88);
+}
+.corporate-rule i:last-child {
+  transform: rotate(180deg);
+}
+.corporate-wordmark > small {
+  display: block;
+  font-family: Georgia, serif;
+  letter-spacing: 2.6px;
+  font-size: 7px;
+  color: #b3b28c;
+  margin-top: 6px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.identity-sidebar {
+  gap: 9px;
+  flex: 1;
+}
+.identity-sidebar .corporate-mark {
+  width: 42px;
+  height: 47px;
+}
+.sidebar-brand .corporate-wordmark > strong {
+  font-size: 17px;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  color: #ebe2c5;
+  max-width: 131px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.sidebar-brand .corporate-wordmark > strong.long-company-name {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.identity-sidebar .corporate-rule {
+  font-size: 5px;
+  letter-spacing: 1px;
+  gap: 5px;
+  margin-top: 4px;
+}
+.identity-sidebar .corporate-rule i {
+  width: 9px;
+}
+.sidebar-brand .corporate-wordmark > small {
+  font-size: 5px;
+  letter-spacing: 1.2px;
+  margin-top: 4px;
+  color: #adad87;
+}
+.sidebar-brand {
+  gap: 5px;
+}
+.enterprise-card .corporate-mark {
+  width: 32px;
+  height: 35px;
+  color: #c2c9a0;
+}
+.enterprise-card > div {
+  min-width: 0;
+  flex: 1;
+}
+.enterprise-card small {
+  line-height: 1.7;
+}
+.setup-story > .corporate-identity {
+  min-height: 69px;
+  z-index: 1;
+  align-self: flex-start;
+}
+.setup-story .corporate-identity:after {
+  content: '企业形象预览';
+  position: absolute;
+  bottom: -23px;
+  left: 76px;
+  font-size: 7px;
+  letter-spacing: 2px;
+  color: #77906f;
+}
+.setup-logo-row .corporate-mark {
+  width: 75px;
+  height: 81px;
+  color: #80946a;
+  background: linear-gradient(140deg, #f4f5e8, #e4e9d5);
+  border: 1px solid #dce3cb;
+  border-radius: 10px;
+  padding: 10px;
+  filter: none;
+}
+.setup-logo-row .corporate-mark.custom-mark {
+  padding: 6px;
+}
+.logo-options {
+  gap: 8px;
+  margin-top: 10px;
+}
+.logo-options > button {
+  width: 43px;
+  height: 45px;
+  padding: 5px;
+  border-radius: 6px;
+  background: #f9fbf4;
+  color: #a4ae8c;
+  font-family: inherit;
+}
+.logo-options > button.selected {
+  background: #e9efde;
+  border-color: #9db480;
+  color: #6e8756;
+}
+.logo-options > button .corporate-mark {
+  width: 29px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  border-radius: 0;
+}
+.logo-options > button .corporate-mark svg {
+  filter: none;
+}
+.logo-options > button:last-child {
+  width: 34px;
+}
+.emblem-description {
+  margin-top: 8px;
+  font-size: 9px;
+  color: #8d9c79;
+  letter-spacing: 0.3px;
+}
+.crafted-bottle {
+  display: block;
+  overflow: visible;
+  color: #b29a60;
+  flex-shrink: 0;
+  isolation: isolate;
+}
+.bottle-brand-inscription {
+  fill: #6b7758;
+  font-family: var(--serif);
+  font-weight: 600;
+  filter: drop-shadow(0 0.8px 0 #fffff2);
+}
+.bottle-product-inscription {
+  font-family: var(--serif);
+  fill: #8b825c;
+  letter-spacing: 0.5px;
+}
+.bottle-emblem {
+  color: #9e925f;
+}
+.bottle-category {
+  fill: #9b9375;
+  font-family: var(--serif);
+}
+.bottle-maker {
+  fill: #8f8a72;
+  font-family: var(--serif);
+}
+.bottle-foil {
+  color: #b4a16b;
+}
+.bottle-collectible .bottle-brand-inscription {
+  fill: #dfc98d;
+  filter: drop-shadow(0 1px 1px #031d16);
+}
+.bottle-collectible .bottle-product-inscription,
+.bottle-collectible .bottle-category,
+.bottle-collectible .bottle-maker {
+  fill: #baa67a;
+}
+.bottle-collectible .bottle-emblem {
+  color: #c4ab70;
+}
+.bottle-simple .bottle-brand-inscription {
+  fill: #8a6954;
+}
+.bottle-simple .bottle-emblem {
+  color: #a38361;
+}
+.setup-story .bottle-scene {
+  height: 390px;
+  margin-top: 25px;
+}
+.setup-bottle {
+  position: absolute;
+  width: 230px;
+  right: 23px;
+  bottom: -4px;
+  transform: rotate(-7deg);
+  filter: drop-shadow(15px 16px 13px #061b1966);
+}
+.setup-story .bottle-caption {
+  right: 4px;
+  bottom: 53px;
+  color: #9ca880;
+}
+.product-card {
+  padding: 0;
+}
+.product-visual {
+  height: 365px;
+  position: relative;
+  align-items: center;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 40% 25%, #ffffff 0%, #f2f3e8 47%, #e7ecdd 100%);
+  padding: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #e7ebde;
+}
+.product-visual:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: auto -15% -97px;
+  height: 175px;
+  border-radius: 50%;
+  border-top: 1px solid #ffffffd9;
+  background: linear-gradient(175deg, #f9faf3, #e2e8d6);
+  box-shadow: 0 -9px 40px #a0ad8b17;
+}
+.product-visual:after {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: repeating-linear-gradient(
+    105deg,
+    transparent 0,
+    transparent 2px,
+    #77835b03 2px,
+    #77835b03 3px
+  );
+  pointer-events: none;
+}
+.product-bottle {
+  width: 201px;
+  max-height: 100%;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(9px 9px 11px #4f5e3d18);
+}
+.product-visual .product-watermark {
+  font-size: 207px;
+  right: 22px;
+  bottom: 10px;
+  color: #dce4cc;
+  opacity: 0.63;
+  z-index: 0;
+  font-weight: 500;
+  pointer-events: none;
+}
+.product-visual > .badge {
+  right: 18px;
+  top: 18px;
+  font-size: 9px;
+  z-index: 3;
+  background: #ffffffa8;
+  border: 1px solid #e0e6d5;
+  color: #81916d;
+}
+.product-scene-caption {
+  position: absolute;
+  left: 21px;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  z-index: 1;
+}
+.product-scene-caption > span {
+  font-family: var(--serif);
+  font-size: 11px;
+  letter-spacing: 4px;
+  writing-mode: vertical-rl;
+  color: #92a07d;
+  max-height: 145px;
+}
+.product-scene-caption > small {
+  font-family: Georgia, serif;
+  font-size: 6px;
+  letter-spacing: 1.6px;
+  writing-mode: vertical-rl;
+  color: #acb79b;
+}
+.product-volume {
+  position: absolute;
+  right: 20px;
+  bottom: 21px;
+  font-size: 8px;
+  color: #a0ad8b;
+  letter-spacing: 1px;
+  z-index: 1;
+}
+.product-visual.packaging-典藏 {
+  background: radial-gradient(ellipse at 39% 20%, #edf1e4, #dfe8d4 55%, #d0ddc6);
+}
+.product-visual.packaging-简装 {
+  background: radial-gradient(ellipse at 40% 20%, #fffdf4, #f3eee0 65%, #eae2cd);
+}
+.product-visual.packaging-简装 .product-watermark {
+  color: #e4d9bc;
+}
+@media (min-width: 1500px) {
+  .identity-sidebar .corporate-mark {
+    width: 46px;
+    height: 50px;
+  }
+  .sidebar-brand .corporate-wordmark > strong {
+    font-size: 19px;
+  }
+  .setup-story .bottle-scene {
+    height: 430px;
+  }
+  .setup-bottle {
+    width: 256px;
+    right: 58px;
+  }
+  .setup-story > .corporate-identity .corporate-wordmark > strong {
+    font-size: 30px;
+  }
+  .product-visual {
+    height: 390px;
+  }
+  .product-bottle {
+    width: 213px;
+  }
+}
+@media (max-width: 1200px) {
+  .identity-sidebar {
+    gap: 6px;
+  }
+  .identity-sidebar .corporate-mark {
+    width: 35px;
+    height: 40px;
+  }
+  .sidebar-brand .corporate-wordmark > strong {
+    font-size: 15px;
+    letter-spacing: 1.6px;
+  }
+  .sidebar-brand .corporate-wordmark > small {
+    font-size: 4.7px;
+    letter-spacing: 1px;
+  }
+  .identity-sidebar .corporate-rule {
+    font-size: 4.5px;
+  }
+  .setup-story > .corporate-identity {
+    gap: 11px;
+  }
+  .identity-masthead .corporate-mark {
+    width: 50px;
+    height: 57px;
+  }
+  .corporate-wordmark > strong {
+    font-size: 23px;
+    letter-spacing: 3px;
+  }
+  .corporate-wordmark > strong.long-company-name {
+    font-size: 16px;
+  }
+  .setup-story .corporate-identity:after {
+    left: 62px;
+  }
+  .setup-bottle {
+    width: 214px;
+    right: 6px;
+  }
+  .product-visual {
+    height: 340px;
+  }
+  .product-bottle {
+    width: 184px;
+  }
+  .product-scene-caption {
+    left: 17px;
+  }
+  .product-scene-caption > span {
+    font-size: 10px;
+    letter-spacing: 3px;
+  }
+  .product-visual .product-watermark {
+    font-size: 174px;
+    right: 12px;
+    bottom: 25px;
+  }
+}
+@media (max-width: 1000px) {
+  .corporate-wordmark > strong {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+  .corporate-rule {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+  .corporate-wordmark > small {
+    font-size: 6px;
+    letter-spacing: 1.8px;
+  }
+  .setup-story > .corporate-identity {
+    gap: 9px;
+  }
+  .identity-masthead .corporate-mark {
+    width: 43px;
+    height: 49px;
+  }
+  .setup-story .corporate-identity:after {
+    left: 53px;
+  }
+  .setup-bottle {
+    width: 200px;
+    right: -4px;
+  }
+  .product-visual {
+    height: 330px;
+  }
+  .product-bottle {
+    width: 179px;
+  }
+  .product-visual .product-watermark {
+    font-size: 150px;
+    right: 8px;
+    bottom: 39px;
+  }
+  .product-volume {
+    font-size: 7px;
+    right: 14px;
+  }
+  .product-scene-caption {
+    left: 13px;
+  }
+  .product-visual > .badge {
+    right: 13px;
+    top: 15px;
+    font-size: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .setup-story > .corporate-identity {
+    min-height: 57px;
+  }
+  .setup-story > .corporate-identity .corporate-mark {
+    width: 43px;
+    height: 49px;
+  }
+  .setup-story > .corporate-identity .corporate-wordmark > strong {
+    font-size: 23px;
+    letter-spacing: 3px;
+  }
+  .setup-story > .corporate-identity .corporate-wordmark > strong.long-company-name {
+    font-size: 14px;
+    letter-spacing: 1px;
+    max-width: 215px;
+  }
+  .setup-story .corporate-identity:after {
+    display: none;
+  }
+  .setup-story .setup-story-content {
+    margin-top: 30px;
+  }
+  .setup-story .bottle-scene {
+    position: absolute;
+    height: 230px;
+    width: 145px;
+    right: -17px;
+    top: 8px;
+    margin: 0;
+    opacity: 0.78;
+  }
+  .setup-bottle {
+    width: 133px;
+    right: 0;
+    bottom: 5px;
+    transform: rotate(-7deg);
+  }
+  .setup-story .bottle-caption {
+    display: none;
+  }
+  .setup-logo-row .corporate-mark {
+    width: 70px;
+    height: 76px;
+  }
+  .logo-options > button {
+    width: 39px;
+    height: 41px;
+  }
+  .logo-options > button .corporate-mark {
+    width: 27px;
+    height: 30px;
+  }
+  .emblem-description {
+    font-size: 8px;
+  }
+  .product-visual {
+    height: 355px;
+  }
+  .product-bottle {
+    width: 192px;
+  }
+  .product-visual .product-watermark {
+    font-size: 185px;
+    right: 19px;
+    bottom: 17px;
+  }
+  .product-scene-caption {
+    left: 22px;
+    top: 26px;
+  }
+  .product-scene-caption > span {
+    font-size: 11px;
+    letter-spacing: 4px;
+  }
+  .product-volume {
+    right: 20px;
+    font-size: 8px;
+  }
+  .identity-sidebar .corporate-mark {
+    width: 42px;
+    height: 47px;
+  }
+  .sidebar-brand .corporate-wordmark > strong {
+    font-size: 17px;
+    letter-spacing: 2px;
+  }
+  .sidebar-brand .corporate-wordmark > strong.long-company-name {
+    font-size: 11px;
+  }
+  .identity-sidebar .corporate-rule {
+    font-size: 5px;
+  }
+  .sidebar-brand .corporate-wordmark > small {
+    font-size: 5px;
+    letter-spacing: 1.2px;
+  }
+}
