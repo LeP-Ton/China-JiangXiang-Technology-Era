@@ -139,7 +139,7 @@
   margin-top: 8px;
 }
 .lab-packaging-preview {
-  height: 260px;
+  height: 320px;
   background: radial-gradient(ellipse at 50% 25%, #fbfcf6, #eef2e6);
   display: flex;
   align-items: center;
@@ -149,16 +149,132 @@
   margin-bottom: 16px;
   overflow: hidden;
 }
-.lab-packaging-preview > small {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  font-size: 8px;
-  color: #a1af91;
-}
 .lab-bottle {
-  width: 135px;
-  height: 252px;
+  width: 160px;
+  height: 300px;
+}
+.lab-preview-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 0 2px 18px;
+  overflow-wrap: anywhere;
+}
+.lab-preview-caption > small {
+  color: #819170;
+  font-size: 11px;
+}
+.lab-preview-caption > strong {
+  color: #486340;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.lab-preview-caption > span {
+  color: #8d9d7f;
+  font-size: 10px;
+}
+.bottle-inspect-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  min-height: 34px;
+  border: 1px solid #cbd5bf;
+  border-radius: 5px;
+  background: #fffef6ed;
+  color: #536c45;
+  font-size: 11px;
+  z-index: 4;
+}
+.lab-packaging-preview > .bottle-inspect-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+.product-visual > .bottle-inspect-button {
+  position: absolute;
+  bottom: 15px;
+  left: 18px;
+}
+.bottle-inspector {
+  width: min(580px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid #dae1cf;
+  border-radius: 10px;
+  color: #53684a;
+  background: #fcfcf7;
+  box-shadow: 0 24px 80px #07180d40;
+}
+.bottle-inspector::backdrop {
+  background: #10251bb3;
+  backdrop-filter: blur(4px);
+}
+.bottle-inspector-content {
+  padding: 22px;
+}
+.bottle-inspector-content > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.bottle-inspector-content header > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.bottle-inspector-content header small {
+  font-size: 10px;
+  color: #8d9e7e;
+}
+.bottle-inspector-content h2 {
+  margin: 10px 0 7px;
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #45613c;
+}
+.bottle-inspector-content header p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #7f9271;
+}
+.bottle-inspector-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  height: 36px;
+  padding: 0;
+  color: #7d9070;
+  background: #eef2e6;
+  border: 1px solid #e0e7d5;
+  border-radius: 50%;
+}
+.bottle-inspector-scene {
+  display: grid;
+  place-items: center;
+  height: min(460px, 56dvh);
+  border: 1px solid #e6ebdd;
+  border-radius: 7px;
+  background: radial-gradient(ellipse at 40% 25%, #fffef7, #e9efdf);
+}
+.bottle-inspector-scene > .inspector-bottle {
+  width: auto;
+  /* 避免百分比高度在网格中按 SVG 自身比例撑开，导致瓶底被裁掉。 */
+  height: min(460px, 56dvh);
+  max-width: 100%;
+}
+.bottle-inspector-hint {
+  margin: 13px 0 0;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #8b9b7c;
 }
 @media (max-width: 760px) {
   .founding-stages {
@@ -383,15 +499,15 @@
   isolation: isolate;
 }
 .bottle-brand-inscription {
-  fill: #6b7758;
+  fill: #677958;
   font-family: var(--serif);
   font-weight: 600;
   filter: drop-shadow(0 0.8px 0 #fffff2);
 }
 .bottle-product-inscription {
   font-family: var(--serif);
-  fill: #8b825c;
-  letter-spacing: 0.5px;
+  fill: #3e583c;
+  font-weight: 600;
 }
 .bottle-emblem {
   color: #9e925f;
@@ -411,7 +527,9 @@
   fill: #dfc98d;
   filter: drop-shadow(0 1px 1px #031d16);
 }
-.bottle-collectible .bottle-product-inscription,
+.bottle-collectible .bottle-product-inscription {
+  fill: #f0d9a3;
+}
 .bottle-collectible .bottle-category,
 .bottle-collectible .bottle-maker {
   fill: #baa67a;
@@ -426,7 +544,9 @@
 .bottle-simple .bottle-emblem {
   color: #994738;
 }
-.bottle-simple .bottle-product-inscription,
+.bottle-simple .bottle-product-inscription {
+  fill: #303e32;
+}
 .bottle-simple .bottle-category,
 .bottle-simple .bottle-maker {
   fill: #5f6858;
@@ -547,11 +667,13 @@
 }
 .product-visual.packaging-典藏,
 .lab-packaging-preview.packaging-典藏,
+.bottle-inspector-scene.packaging-典藏,
 .appearance-bottle-scene.packaging-典藏 {
   background: radial-gradient(ellipse at 39% 20%, #edf1e4, #dfe8d4 55%, #d0ddc6);
 }
 .product-visual.packaging-简装,
 .lab-packaging-preview.packaging-简装,
+.bottle-inspector-scene.packaging-简装,
 .appearance-bottle-scene.packaging-简装 {
   background: radial-gradient(ellipse at 40% 20%, #fcfdf9, #ebf0e9 65%, #dce6dc);
 }

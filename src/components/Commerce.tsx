@@ -25,6 +25,7 @@ import {
 import type { PanelProps } from './shared';
 import WineBottle from './WineBottle';
 import ProductAppearance from './ProductAppearance';
+import BottleInspector from './BottleInspector';
 
 function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
   const [price, setPrice] = useState(String(p.recipe.price));
@@ -46,6 +47,7 @@ function ProductCard({ p, act, navigate, s }: PanelProps & { p: Product }) {
         <span className="product-watermark">酿</span>
         <Badge tone="gray">{p.recipe.packaging}包装</Badge>
         <span className="product-volume">酱香型白酒 · 500 mL</span>
+        <BottleInspector recipe={p.recipe} company={s.company} />
       </div>
       <div className="product-details">
         <div className="eyebrow">

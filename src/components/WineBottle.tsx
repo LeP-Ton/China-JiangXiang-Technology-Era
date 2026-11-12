@@ -12,37 +12,96 @@ interface WineBottleProps {
   unbranded?: boolean;
 }
 
-function BrandInscription({
-  brand,
-  top = 275,
-  height = 126,
+function ProductInscription({
+  product,
+  top = 285,
+  height = 125,
 }: {
-  brand: string;
+  product: string;
   top?: number;
   height?: number;
 }) {
-  const characters = Array.from(brand);
-  const rows = characters.length <= 4 ? characters.length : characters.length <= 12 ? 4 : 6;
-  const columns = Math.ceil(characters.length / rows);
+  const characters = Array.from(product);
+  const columns =
+    characters.length <= 4 ? 1 : Math.ceil(characters.length / (characters.length <= 12 ? 4 : 6));
+  const rows = Math.ceil(characters.length / columns);
+  const columnLengths = Array.from(
+    { length: columns },
+    (_, column) =>
+      Math.floor(characters.length / columns) + (column < characters.length % columns ? 1 : 0),
+  );
+  let offset = 0;
+  const textColumns = columnLengths.map((length) => {
+    const letters = characters.slice(offset, offset + length);
+    offset += length;
+    return letters;
+  });
   const baseFontSize =
     characters.length <= 2 ? 44 : characters.length <= 4 ? 34 : characters.length <= 12 ? 27 : 22;
-  const fontSize =
-    columns === 1 ? baseFontSize : Math.min(baseFontSize, (82 - (columns - 1) * 3) / columns);
-  const lineHeight = Math.min(44, height / rows);
-  const columnWidth = fontSize + 3;
-  const start = top + Math.max(0, (4 - rows) * 9);
+  const rowGap = rows > 4 ? 3 : 5;
+  // 按酒标的可用宽高同时约束字号，长名称分列且保留字间留白。
+  const fontSize = Math.min(
+    baseFontSize,
+    (82 - (columns - 1) * 4) / columns,
+    (height - (rows - 1) * rowGap) / rows,
+  );
+  const lineHeight = fontSize + rowGap;
+  const columnWidth = fontSize + 4;
   return (
-    <g className="bottle-brand-inscription" aria-hidden="true">
-      {characters.map((character, index) => {
-        const column = Math.floor(index / rows);
+    <g className="bottle-product-inscription" aria-hidden="true">
+      {textColumns.map((letters, column) => {
         const x = 150 + ((columns - 1) / 2 - column) * columnWidth;
-        const y = start + (index % rows) * lineHeight;
+        const blockHeight = letters.length * fontSize + (letters.length - 1) * rowGap;
+        const start = top + (height - blockHeight) / 2 + fontSize;
         return (
-          <text key={index} x={x} y={y} fontSize={fontSize} textAnchor="middle">
-            {character}
-          </text>
+          <g key={column}>
+            {letters.map((character, row) => (
+              <text
+                key={row}
+                x={x}
+                y={start + row * lineHeight}
+                fontSize={fontSize}
+                textAnchor="middle"
+              >
+                {character}
+              </text>
+            ))}
+          </g>
         );
       })}
+    </g>
+  );
+}
+
+function BrandSignature({ brand, bottom = 275 }: { brand: string; bottom?: number }) {
+  const characters = Array.from(brand);
+  const perLine = characters.length <= 12 ? 6 : 10;
+  const fontSize =
+    characters.length <= 2
+      ? 16
+      : characters.length <= 4
+        ? 14
+        : characters.length <= 6
+          ? 12
+          : characters.length <= 12
+            ? 10
+            : 8;
+  const lines: string[] = [];
+  for (let i = 0; i < characters.length; i += perLine)
+    lines.push(characters.slice(i, i + perLine).join(''));
+  return (
+    <g className="bottle-brand-inscription" aria-hidden="true">
+      {lines.map((line, index) => (
+        <text
+          key={index}
+          x="150"
+          y={bottom - (lines.length - 1 - index) * (fontSize + 2)}
+          fontSize={fontSize}
+          textAnchor="middle"
+        >
+          {line}
+        </text>
+      ))}
     </g>
   );
 }
@@ -67,7 +126,6 @@ function SimpleBottle({
   const fill = (name: string) => `url(#${id}-${name})`;
   const outline =
     'M128 96H172V174C172 187 181 199 197 218C207 230 213 241 213 258V493Q213 515 193 518H107Q87 515 87 493V258C87 241 93 230 103 218C119 199 128 187 128 174Z';
-  const productLines = (unbranded ? '品牌待创立，产品待研发' : product).match(/.{1,14}/gu) ?? [];
   return (
     <svg
       className={`crafted-bottle bottle-simple ${className ?? ''}`}
@@ -79,6 +137,7 @@ function SimpleBottle({
           : `${brand} · ${product} · 简装包装酒瓶`
       }
       data-brand={unbranded ? '' : brand}
+      data-product={unbranded ? '' : product}
       data-packaging="简装"
     >
       <title>{unbranded ? `${company}企业形象示意` : `${brand} · ${product}`}</title>
@@ -153,37 +212,35 @@ function SimpleBottle({
         />
         <rect
           x="98"
-          y="272"
+          y="258"
           width="104"
-          height="187"
+          height="218"
           rx="1.5"
           fill={fill('plain-paper')}
           stroke="#c4c4b5"
           strokeWidth=".65"
         />
-        <path d="M99 298H201M99 301H201" stroke="#a14638" strokeWidth="1.1" />
+        <path d="M99 285H201M99 288H201" stroke="#a14638" strokeWidth="1.1" />
         <g
           className="bottle-emblem"
-          transform={unbranded ? 'translate(127 337) scale(.72)' : 'translate(141 276) scale(.28)'}
+          transform={unbranded ? 'translate(127 337) scale(.72)' : 'translate(141 262) scale(.28)'}
         >
           <BottleEmblem logo={logo} />
         </g>
-        {!unbranded && <BrandInscription brand={brand} top={320} height={90} />}
-        {productLines.map((line, index) => (
-          <text
-            key={index}
-            x="150"
-            y={424 + index * 10}
-            textAnchor="middle"
-            fontSize={productLines.length > 1 ? 6.6 : 8}
-            className="bottle-product-inscription"
-          >
-            {line}
+        {unbranded ? (
+          <text x="150" y="427" textAnchor="middle" fontSize="11" className="bottle-category">
+            品牌与产品待创立
           </text>
-        ))}
+        ) : (
+          <>
+            <BrandSignature brand={brand} bottom={319} />
+            <ProductInscription product={product} top={323} height={112} />
+          </>
+        )}
+        <path d="M127 443h46" stroke="#b0b5a3" strokeWidth=".6" />
         <text
           x="150"
-          y="450"
+          y="460"
           textAnchor="middle"
           fontSize="6"
           letterSpacing="1.2"
@@ -234,8 +291,8 @@ export default function WineBottle({
 }: WineBottleProps) {
   const id = `wine-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const fill = (name: string) => `url(#${id}-${name})`;
-  const displayBrand = brand.trim() || '待命名';
-  const displayProduct = product.trim() || '品牌首酿';
+  const displayBrand = brand.trim() || '待命名品牌';
+  const displayProduct = product.trim() || '待命名产品';
   const collectible = packaging === '典藏';
   if (packaging === '简装')
     return (
@@ -251,13 +308,6 @@ export default function WineBottle({
     );
   const outline =
     'M112 121H188V162C188 180 210 180 220 207C227 228 226 263 226 290L224 481C224 510 202 528 150 529C98 528 76 510 76 481L74 290C74 263 73 228 80 207C90 180 112 180 112 162Z';
-  const productLines = unbranded
-    ? ['品牌待创立', '产品待研发']
-    : Array.from(displayProduct).reduce<string[]>((lines, character, i) => {
-        const row = Math.floor(i / 14);
-        lines[row] = (lines[row] || '') + character;
-        return lines;
-      }, []);
   return (
     <svg
       className={`crafted-bottle ${collectible ? 'bottle-collectible' : 'bottle-elegant'} ${className}`}
@@ -269,6 +319,7 @@ export default function WineBottle({
           : `${displayBrand} · ${displayProduct} · ${packaging}包装酒瓶`
       }
       data-brand={unbranded ? '' : displayBrand}
+      data-product={unbranded ? '' : displayProduct}
       data-packaging={packaging}
     >
       <title>{unbranded ? `${company}企业形象示意` : `${displayBrand} · ${displayProduct}`}</title>
@@ -414,20 +465,22 @@ export default function WineBottle({
         >
           <BottleEmblem logo={logo} />
         </g>
-        {!unbranded && <BrandInscription brand={displayBrand} />}
-        <path d="M126 402h48" stroke="currentColor" className="bottle-foil" strokeWidth=".55" />
-        {productLines.map((line, index) => (
-          <text
-            key={index}
-            x="150"
-            y={416 + index * 10}
-            textAnchor="middle"
-            fontSize={productLines.length > 1 ? 6.6 : 8}
-            className="bottle-product-inscription"
-          >
-            {line}
-          </text>
-        ))}
+        {unbranded ? (
+          <g className="bottle-category" textAnchor="middle" fontSize="11">
+            <text x="150" y="414">
+              品牌待创立
+            </text>
+            <text x="150" y="430">
+              产品待研发
+            </text>
+          </g>
+        ) : (
+          <>
+            <BrandSignature brand={displayBrand} />
+            <ProductInscription product={displayProduct} />
+            <path d="M126 423h48" stroke="currentColor" className="bottle-foil" strokeWidth=".55" />
+          </>
+        )}
         <text
           x="150"
           y="457"

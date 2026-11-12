@@ -7,6 +7,7 @@ import { FlavorChart } from './Charts';
 import { Badge, Field, money, PageTitle, Panel, Progress, Tip } from './shared';
 import type { PanelProps } from './shared';
 import WineBottle from './WineBottle';
+import BottleInspector from './BottleInspector';
 
 export default function Laboratory({ s, act, selection }: PanelProps) {
   const selectedRecipe = s.recipes.find((r) => r.id === selection?.recipeId) ?? s.recipes[0];
@@ -241,6 +242,7 @@ export default function Laboratory({ s, act, selection }: PanelProps) {
               />
             ) : (
               <div className={`lab-packaging-preview packaging-${r.packaging}`}>
+                <BottleInspector recipe={r} company={s.company} />
                 <WineBottle
                   className="lab-bottle"
                   brand={r.brand}
@@ -249,7 +251,15 @@ export default function Laboratory({ s, act, selection }: PanelProps) {
                   logo={s.company.logo}
                   packaging={r.packaging}
                 />
-                <small>{r.packaging} · 保存后可在产品设计档案中查看</small>
+              </div>
+            )}
+            {preview === 'bottle' && (
+              <div className="lab-preview-caption">
+                <small>
+                  {r.brand.trim() || '待命名品牌'} / {r.packaging}包装
+                </small>
+                <strong>{r.name.trim() || '待命名产品'}</strong>
+                <span>设计预览 · 保存后可在产品设计档案中查看</span>
               </div>
             )}
             <div className="lab-scores">
