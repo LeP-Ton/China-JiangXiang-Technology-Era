@@ -546,16 +546,6 @@ td > small {
   color: #8a9c86;
   margin-top: 7px;
 }
-.enterprise-card {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  border: 1px solid #ffffff15;
-  border-radius: 7px;
-  padding: 13px 10px;
-  margin-bottom: 13px;
-  background: #ffffff04;
-}
 .company-logo {
   font-family: var(--serif);
   width: 33px;
@@ -576,29 +566,6 @@ td > small {
   width: 100%;
   object-fit: contain;
   background: #f8f7ec;
-}
-.enterprise-card strong {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-  color: #e7eadb;
-  max-width: 132px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.enterprise-card small {
-  display: block;
-  color: #83987f;
-  font-size: 9px;
-  margin-top: 5px;
-}
-.company-status {
-  margin-left: auto;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #7f9d70;
 }
 .sidebar nav {
   overflow: auto;
@@ -3884,10 +3851,6 @@ td > small {
 }
 .nav-item {
   font-size: 12px;
-}
-.enterprise-card small {
-  color: #94aa88;
-  font-size: 10px;
 }
 .page-title p,
 .body-copy,

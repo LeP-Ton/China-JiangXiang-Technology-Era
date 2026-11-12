@@ -309,18 +309,6 @@
 .sidebar-brand {
   gap: 5px;
 }
-.enterprise-card .corporate-mark {
-  width: 32px;
-  height: 35px;
-  color: #c2c9a0;
-}
-.enterprise-card > div {
-  min-width: 0;
-  flex: 1;
-}
-.enterprise-card small {
-  line-height: 1.7;
-}
 .setup-story > .corporate-identity {
   min-height: 69px;
   z-index: 1;

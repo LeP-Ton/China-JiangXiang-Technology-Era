@@ -38,7 +38,7 @@ import { Finance, News, People } from './components/Management';
 import { Production, StorageCenter } from './components/Operations';
 import Research from './components/Research';
 import Setup from './components/Setup';
-import { CompanyIdentity, CompanyMark } from './components/BrandIdentity';
+import { CompanyIdentity } from './components/BrandIdentity';
 import { Badge, money, num, Progress } from './components/shared';
 import type { NavigationSelection } from './components/shared';
 
@@ -226,14 +226,6 @@ function GameApp() {
               <button className="mobile-only" aria-label="关闭菜单" onClick={() => setMenu(false)}>
                 <X size={20} />
               </button>
-            </div>
-            <div className="enterprise-card">
-              <CompanyMark logo={game.company.logo} name={game.company.name} />
-              <div>
-                <strong>{game.company.name}</strong>
-                <small>{game.company.direction} · 地方酒厂起步</small>
-              </div>
-              <span className="company-status" />
             </div>
             <nav>
               {NAV.map((n) => (
